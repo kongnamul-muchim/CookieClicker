@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쿠키 클리커</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>쿠키 클리커</h1>
+      <button id="theme-toggle" class="theme-toggle" title="테마 전환">🌙</button>
+    </header>
+    
+    <main>
+      <section class="game-area">
+        <div class="cookie-display">
+          <button id="cookie-btn" class="cookie-button">🍪</button>
+          <div class="stats">
+            <p>쿠키: <span id="cookie-count">0</span>개</p>
+            <p>클릭당: <span id="cookies-per-click">1</span>개</p>
+            <p>초당: <span id="cookies-per-second">0</span>개</p>
+          </div>
+        </div>
+      </section>
+      
+      <section class="shop-area">
+        <h2>업그레이드 상점</h2>
+        <div id="upgrade-list"></div>
+      </section>
+      
+      <section class="actions">
+        <div class="sound-controls">
+          <button id="sound-toggle" class="sound-btn active">🔊 사운드</button>
+          <button id="bgm-toggle" class="sound-btn">🎵 BGM</button>
+        </div>
+        <button id="reset-btn" class="reset-button">게임 리셋</button>
+      </section>
+    </main>
+  </div>
+  
+  <script src="sounds.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
