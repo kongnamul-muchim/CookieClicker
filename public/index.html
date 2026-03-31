@@ -3,44 +3,150 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>쿠키 클리커</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=1743350400">
 </head>
 <body>
   <div class="container">
     <header>
       <h1>쿠키 클리커</h1>
-      <button id="theme-toggle" class="theme-toggle" title="테마 전환">🌙</button>
+      <div class="header-controls">
+        <button id="theme-toggle" class="theme-toggle" title="테마 전환">🌙</button>
+        <button id="settings-btn" class="settings-btn" title="설정">⚙️</button>
+      </div>
     </header>
     
     <main>
       <section class="game-area">
         <div class="cookie-display">
+          <div class="cookie-count-header">
+            <span id="cookie-count">0</span> 쿠키
+          </div>
           <button id="cookie-btn" class="cookie-button">🍪</button>
-          <div class="stats">
-            <p>쿠키: <span id="cookie-count">0</span>개</p>
-            <p>클릭당: <span id="cookies-per-click">1</span>개</p>
-            <p>초당: <span id="cookies-per-second">0</span>개</p>
+          <div class="stats-corner">
+            <span>클릭당: <span id="cookies-per-click">1</span></span>
+            <span>초당: <span id="cookies-per-second">0</span></span>
           </div>
         </div>
       </section>
       
-      <section class="shop-area">
-        <h2>업그레이드 상점</h2>
-        <div id="upgrade-list"></div>
-      </section>
-      
-      <section class="actions">
-        <div class="sound-controls">
-          <button id="sound-toggle" class="sound-btn active">🔊 사운드</button>
-          <button id="bgm-toggle" class="sound-btn">🎵 BGM</button>
-        </div>
-        <button id="reset-btn" class="reset-button">게임 리셋</button>
+      <section class="action-buttons">
+        <button id="shop-btn" class="action-btn">🛒 상점</button>
+        <button id="skill-tree-btn" class="action-btn">🌳 스킬</button>
       </section>
     </main>
   </div>
   
-  <script src="sounds.js"></script>
-  <script src="game.js"></script>
+  <div id="toast-container"></div>
+  
+  <div id="settings-modal" class="modal">
+    <div class="modal-content settings-modal-content">
+      <div class="modal-header">
+        <h2>⚙️ 설정</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="sound">사운드</button>
+        <button class="tab-btn" data-tab="stats">통계</button>
+        <button class="tab-btn" data-tab="achievements">업적</button>
+      </div>
+      <div class="tab-content">
+        <div id="sound-tab" class="tab-panel active">
+          <div class="sound-toggle-row">
+            <button id="sound-toggle" class="sound-btn active">🔊 사운드 ON</button>
+            <button id="bgm-toggle" class="sound-btn">🎵 BGM OFF</button>
+          </div>
+          <div class="volume-controls">
+            <label>
+              <span>🔊 효과음</span>
+              <input type="range" id="sfx-volume" min="0" max="100" value="50">
+            </label>
+            <label>
+              <span>🎵 배경음</span>
+              <input type="range" id="bgm-volume" min="0" max="100" value="30">
+            </label>
+          </div>
+        </div>
+        <div id="stats-tab" class="tab-panel">
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">총 클릭</span>
+              <span id="stat-total-clicks" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">총 획득 쿠키</span>
+              <span id="stat-total-cookies" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">업그레이드 구매</span>
+              <span id="stat-total-upgrades" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">강화 횟수</span>
+              <span id="stat-total-enhancements" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">초월 횟수</span>
+              <span id="stat-total-transcends" class="stat-value">0</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">환생</span>
+              <span id="stat-prestige-count" class="stat-value">0</span>
+            </div>
+          </div>
+        </div>
+        <div id="achievements-tab" class="tab-panel">
+          <div id="achievements-container" class="achievements-grid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="shop-modal" class="modal">
+    <div class="modal-content shop-modal-content">
+      <div class="modal-header">
+        <h2>🛒 업그레이드 상점</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="click">클릭</button>
+        <button class="tab-btn" data-tab="auto">자동</button>
+        <button class="tab-btn" data-tab="special">특수</button>
+      </div>
+      <div class="tab-content">
+        <div id="click-tab" class="tab-panel active">
+          <div id="click-upgrade-list" class="upgrade-list"></div>
+        </div>
+        <div id="auto-tab" class="tab-panel">
+          <div id="auto-upgrade-list" class="upgrade-list"></div>
+        </div>
+        <div id="special-tab" class="tab-panel">
+          <div id="special-upgrade-list" class="upgrade-list"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="skill-tree-modal" class="modal">
+    <div class="modal-content skill-tree-modal">
+      <div class="modal-header">
+        <h2>🌳 스킬 트리</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="stars-display">
+        보유: <span id="prestige-stars">0</span>⭐ | 
+        환생: <span id="prestige-count">0</span>회
+      </div>
+      <button id="rebirth-btn" class="rebirth-button">🔄 환생하기</button>
+      <div id="skill-tree-container" class="skill-tree-scroll"></div>
+    </div>
+  </div>
+  
+  <script src="sounds-v3.js"></script>
+  <script src="skillTree-v3.js"></script>
+  <script src="game-v3.js"></script>
 </body>
 </html>
