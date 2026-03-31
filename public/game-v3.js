@@ -141,14 +141,6 @@ function updateNormalButton(btn, upgrade) {
   }
 }
 
-function categorizeUpgrades(upgrades) {
-  const clickUpgrades = upgrades.filter(u => u.type === 'click_boost');
-  const autoUpgrades = upgrades.filter(u => ['cursor', 'grandma', 'farm', 'mine', 'factory', 'bank'].includes(u.type));
-  const specialUpgrades = upgrades.filter(u => ['temple', 'wizard_tower', 'portal'].includes(u.type));
-  
-  return { clickUpgrades, autoUpgrades, specialUpgrades };
-}
-
 function createUpgradeItem(upgrade) {
   const name = upgradeNames[upgrade.type] || upgrade.type;
   const description = upgradeDescriptions[upgrade.type] || '';
@@ -283,23 +275,15 @@ function createUpgradeItem(upgrade) {
   return item;
 }
 
-function renderUpgradeList(upgrades, containerId) {
-  const container = document.getElementById(containerId);
+function renderUpgrades() {
+  const container = document.getElementById('upgrade-list');
   if (!container) return;
   container.innerHTML = '';
   
-  upgrades.forEach(upgrade => {
+  gameState.upgrades.forEach(upgrade => {
     const item = createUpgradeItem(upgrade);
     container.appendChild(item);
   });
-}
-
-function renderUpgrades() {
-  const { clickUpgrades, autoUpgrades, specialUpgrades } = categorizeUpgrades(gameState.upgrades);
-  
-  renderUpgradeList(clickUpgrades, 'click-upgrade-list');
-  renderUpgradeList(autoUpgrades, 'auto-upgrade-list');
-  renderUpgradeList(specialUpgrades, 'special-upgrade-list');
 }
 
 function updateUpgrades() {
@@ -633,9 +617,7 @@ function handleUpgradeClick(e) {
   }
 }
 
-document.getElementById('click-upgrade-list').addEventListener('click', handleUpgradeClick);
-document.getElementById('auto-upgrade-list').addEventListener('click', handleUpgradeClick);
-document.getElementById('special-upgrade-list').addEventListener('click', handleUpgradeClick);
+document.getElementById('upgrade-list').addEventListener('click', handleUpgradeClick);
 
 document.getElementById('settings-btn').addEventListener('click', function() {
   document.getElementById('settings-modal').classList.add('active');
