@@ -52,6 +52,38 @@ class PlayerRepository {
     );
     this.saveDB();
   }
+
+  incrementStat(playerId, stat, amount = 1) {
+    this.db.run(
+      `UPDATE players SET ${stat} = COALESCE(${stat}, 0) + ? WHERE id = ?`,
+      [amount, playerId]
+    );
+    this.saveDB();
+  }
+
+  getStats(playerId) {
+    const stmt = this.db.prepare(`
+      SELECT 
+        total_clicks, 
+        total_cookies_earned, 
+        total_upgrades_bought,
+        total_enhancements,
+        total_transcends,
+        prestige_count,
+        prestige_stars
+      FROM players WHERE id = ?
+    `);
+    stmt.bind([playerId]);
+    
+    if (stmt.step()) {
+      const row = stmt.getAsObject();
+      stmt.free();
+      return row;
+    }
+    
+    stmt.free();
+    return null;
+  }
 }
 
 module.exports = PlayerRepository;

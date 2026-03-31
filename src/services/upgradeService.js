@@ -33,15 +33,22 @@ class UpgradeService {
         effects.hasDiscount
       );
       const enhancementCount = upgrade.enhancement_count || 0;
-      const canEnhance = config.canEnhance && upgrade.level >= (enhancementCount + 1) * 10;
+      const isMaxLevel = config.maxLevel !== null && upgrade.level >= config.maxLevel;
+      const canEnhance = config.canEnhance && !isMaxLevel && upgrade.level >= (enhancementCount + 1) * 10;
       const enhanceCost = this.statsCalculator.calculateEnhanceCost(
         config.baseCost, 
         config.multiplier, 
         upgrade.level
       );
-      const isMaxLevel = config.maxLevel !== null && upgrade.level >= config.maxLevel;
       const specialEnhancement = upgrade.special_enhancement || 0;
       const canSpecialEnhance = config.canSpecialEnhance && isMaxLevel && !specialEnhancement;
+      
+      const specialEnhanceCost = config.specialEnhanceMultiplier ? 
+        this.statsCalculator.calculateSpecialEnhanceCost(
+          config.baseCost, 
+          config.specialEnhanceMultiplier,
+          effects.hasDiscount
+        ) : 0;
       
       const nextMilestone = Math.ceil((upgrade.level + 1) / 10) * 10;
       const targetLevel = config.maxLevel !== null ? Math.min(nextMilestone, config.maxLevel) : nextMilestone;
@@ -67,6 +74,7 @@ class UpgradeService {
         specialEffect: config.specialEffect,
         canSpecialEnhance,
         specialEnhancement,
+        specialEnhanceCost,
         batchCost,
         levelsToBuy
       };
@@ -207,7 +215,7 @@ class UpgradeService {
     };
   }
 
-  specialEnhance(playerId, type, currentCookies) {
+  specialEnhance(playerId, type, currentCookies, effects) {
     const config = UPGRADE_CONFIG[type];
     
     if (!config.canSpecialEnhance) {
@@ -228,10 +236,11 @@ class UpgradeService {
       return { success: false, error: 'Already special enhanced' };
     }
     
-    const specialEnhanceCost = this.statsCalculator.calculateEnhanceCost(
+    const hasDiscount = effects && effects.hasDiscount;
+    const specialEnhanceCost = this.statsCalculator.calculateSpecialEnhanceCost(
       config.baseCost, 
-      config.multiplier, 
-      upgrade.level
+      config.specialEnhanceMultiplier,
+      hasDiscount
     );
     
     if (currentCookies < specialEnhanceCost) {

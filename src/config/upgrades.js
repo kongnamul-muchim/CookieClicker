@@ -17,7 +17,8 @@ const UPGRADE_CONFIG = {
     maxLevel: 100,
     canEnhance: true,
     canSpecialEnhance: true,
-    specialEffect: 'click_crit_5pct_5x'
+    specialEffect: 'click_crit_5pct_5x',
+    specialEnhanceMultiplier: 10000
   },
   grandma: { 
     baseCost: 100, 
@@ -27,7 +28,8 @@ const UPGRADE_CONFIG = {
     maxLevel: 100,
     canEnhance: true,
     canSpecialEnhance: true,
-    specialEffect: 'production_1_2x'
+    specialEffect: 'production_1_2x',
+    specialEnhanceMultiplier: 5000
   },
   farm: { 
     baseCost: 1100, 
@@ -37,7 +39,8 @@ const UPGRADE_CONFIG = {
     maxLevel: 100,
     canEnhance: true,
     canSpecialEnhance: true,
-    specialEffect: 'auto_crit_5pct_5x'
+    specialEffect: 'auto_crit_5pct_5x',
+    specialEnhanceMultiplier: 3000
   },
   mine: { 
     baseCost: 12000, 
@@ -47,7 +50,8 @@ const UPGRADE_CONFIG = {
     maxLevel: 100,
     canEnhance: true,
     canSpecialEnhance: true,
-    specialEffect: 'crit_chance_15pct'
+    specialEffect: 'crit_chance_15pct',
+    specialEnhanceMultiplier: 2000
   },
   factory: { 
     baseCost: 130000, 
@@ -57,7 +61,8 @@ const UPGRADE_CONFIG = {
     maxLevel: 100,
     canEnhance: true,
     canSpecialEnhance: true,
-    specialEffect: 'cost_10pct_discount'
+    specialEffect: 'cost_10pct_discount',
+    specialEnhanceMultiplier: 1500
   },
   bank: { 
     baseCost: 1400000, 
@@ -67,7 +72,8 @@ const UPGRADE_CONFIG = {
     maxLevel: 100,
     canEnhance: true,
     canSpecialEnhance: true,
-    specialEffect: 'interest_0_1pct'
+    specialEffect: 'interest_0_1pct',
+    specialEnhanceMultiplier: 1000
   },
   temple: { 
     baseCost: 20000000, 
@@ -77,7 +83,8 @@ const UPGRADE_CONFIG = {
     maxLevel: 100,
     canEnhance: true,
     canSpecialEnhance: true,
-    specialEffect: 'production_1_5x'
+    specialEffect: 'production_1_5x',
+    specialEnhanceMultiplier: 800
   },
   wizard_tower: { 
     baseCost: 330000000, 
@@ -87,7 +94,8 @@ const UPGRADE_CONFIG = {
     maxLevel: 100,
     canEnhance: true,
     canSpecialEnhance: true,
-    specialEffect: 'click_cps_1pct'
+    specialEffect: 'click_cps_1pct',
+    specialEnhanceMultiplier: 500
   },
   portal: { 
     baseCost: 1000000000, 
@@ -97,7 +105,8 @@ const UPGRADE_CONFIG = {
     maxLevel: 100,
     canEnhance: true,
     canSpecialEnhance: true,
-    specialEffect: 'production_2x'
+    specialEffect: 'production_2x',
+    specialEnhanceMultiplier: 300
   }
 };
 

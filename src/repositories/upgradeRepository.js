@@ -85,6 +85,14 @@ class UpgradeRepository {
     this.saveDB();
   }
 
+  resetSpecialEnhancement(playerId, upgradeType) {
+    this.db.run(
+      'UPDATE upgrades SET special_enhancement = 0 WHERE player_id = ? AND upgrade_type = ?',
+      [playerId, upgradeType]
+    );
+    this.saveDB();
+  }
+
   resetAll(playerId) {
     this.db.run(
       'UPDATE upgrades SET level = 0, enhancement_count = 0, special_enhancement = 0 WHERE player_id = ?',

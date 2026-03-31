@@ -14,6 +14,14 @@ class StatsCalculator {
     return nextLevelCost * 5;
   }
 
+  calculateSpecialEnhanceCost(baseCost, specialEnhanceMultiplier, hasDiscount = false) {
+    let cost = Math.floor(baseCost * specialEnhanceMultiplier);
+    if (hasDiscount) {
+      cost = Math.floor(cost * 0.9);
+    }
+    return cost;
+  }
+
   getActiveEffects(upgrades) {
     const effects = {
       clickCritChance: 0,
@@ -104,6 +112,67 @@ class StatsCalculator {
       cookiesPerSecond, 
       effects,
       clickBoostMultiplier
+    };
+  }
+
+  calculateStatsWithSkills(upgrades, playerCookies, skillEffects) {
+    const baseStats = this.calculateStats(upgrades, playerCookies);
+    
+    let cookiesPerClick = baseStats.cookiesPerClick;
+    let cookiesPerSecond = baseStats.cookiesPerSecond;
+    
+    const clickBonusSum = (skillEffects.clickPercentBonus || 0) + (skillEffects.allBonus || 0);
+    cookiesPerClick *= (1 + clickBonusSum / 100);
+    
+    const cpsBonusSum = (skillEffects.cpsPercentBonus || 0) + (skillEffects.allBonus || 0);
+    cookiesPerSecond *= (1 + cpsBonusSum / 100);
+    
+    if (skillEffects.cpsFlat) {
+      cookiesPerSecond += skillEffects.cpsFlat;
+    }
+    
+    if (skillEffects.interestRate > 0 && playerCookies) {
+      const interestGain = playerCookies * (skillEffects.interestRate / 100);
+      const cappedInterest = Math.min(interestGain, cookiesPerSecond * 0.1);
+      cookiesPerSecond += cappedInterest;
+    }
+    
+    if (skillEffects.buildingCpsBonus > 0) {
+      let totalBuildings = 0;
+      for (const upgrade of upgrades) {
+        if (upgrade.upgrade_type !== 'click_boost') {
+          totalBuildings += upgrade.level || 0;
+        }
+      }
+      cookiesPerSecond *= (1 + (totalBuildings * skillEffects.buildingCpsBonus) / 100);
+    }
+    
+    const mergedEffects = {
+      ...baseStats.effects,
+      skillCriticalChance: skillEffects.criticalChance,
+      skillCriticalMultiplier: skillEffects.criticalMultiplier,
+      autoClickRate: skillEffects.autoClickRate,
+      luckBonus: skillEffects.luckBonus,
+      allBonus: skillEffects.allBonus,
+      costDiscount: skillEffects.costDiscount,
+      doubleChance: skillEffects.doubleChance,
+      lightningChance: skillEffects.lightningChance,
+      lightningMultiplier: skillEffects.lightningMultiplier || 10,
+      jackpotChance: skillEffects.jackpotChance,
+      jackpotMultiplier: skillEffects.jackpotMultiplier || 100,
+      allChancesMax: skillEffects.allChancesMax
+    };
+    
+    const hasDiscount = baseStats.effects.hasDiscount || (skillEffects.costDiscount || 0) > 0;
+    const discountPercent = (baseStats.effects.hasDiscount ? 10 : 0) + (skillEffects.costDiscount || 0);
+    
+    return {
+      cookiesPerClick,
+      cookiesPerSecond,
+      effects: mergedEffects,
+      clickBoostMultiplier: baseStats.clickBoostMultiplier,
+      hasDiscount,
+      discountPercent
     };
   }
 

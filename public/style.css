@@ -214,6 +214,7 @@ header h1 {
   gap: 10px;
   max-height: 60vh;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 10px;
 }
 
@@ -292,7 +293,6 @@ header h1 {
   border: 2px solid transparent;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   position: relative;
-  overflow: hidden;
 }
 
 .upgrade-item.can-afford-single {
@@ -303,13 +303,15 @@ header h1 {
 .upgrade-item.can-afford-single::before {
   content: '';
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(45deg, transparent, rgba(255,193,7,0.15), transparent);
-  animation: shimmer 2s infinite;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,193,7,0.2) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer-slide 2s infinite linear;
   pointer-events: none;
+  border-radius: 12px;
 }
 
 .upgrade-item.can-afford-batch {
@@ -320,18 +322,25 @@ header h1 {
 .upgrade-item.can-afford-batch::before {
   content: '';
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(45deg, transparent, rgba(40,167,69,0.1), transparent);
-  animation: shimmer 2s infinite;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(40,167,69,0.15) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer-slide 2s infinite linear;
   pointer-events: none;
+  border-radius: 12px;
 }
 
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
+}
+
+@keyframes shimmer-slide {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
 }
 
 .upgrade-item:hover {
@@ -370,6 +379,7 @@ header h1 {
 
 .upgrade-content {
   flex: 1;
+  min-width: 0;
 }
 
 .upgrade-info {
@@ -386,6 +396,7 @@ header h1 {
   color: var(--text-secondary);
   font-size: 0.9rem;
   margin-top: 5px;
+  word-break: break-word;
 }
 
 .upgrade-details span {
