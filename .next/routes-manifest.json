@@ -1,0 +1,170 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "onMatchHeaders": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [
+      {
+        "source": "/api/:path*",
+        "destination": "/api/:path*",
+        "regex": "^/api(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
+      }
+    ],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/api/enhance/[type]",
+      "regex": "^/api/enhance/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPtype": "nxtPtype"
+      },
+      "namedRegex": "^/api/enhance/(?<nxtPtype>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/skill/unlock/[skillId]",
+      "regex": "^/api/skill/unlock/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPskillId": "nxtPskillId"
+      },
+      "namedRegex": "^/api/skill/unlock/(?<nxtPskillId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/special-enhance/[type]",
+      "regex": "^/api/special\\-enhance/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPtype": "nxtPtype"
+      },
+      "namedRegex": "^/api/special\\-enhance/(?<nxtPtype>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/upgrade/[type]",
+      "regex": "^/api/upgrade/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPtype": "nxtPtype"
+      },
+      "namedRegex": "^/api/upgrade/(?<nxtPtype>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/upgrade-batch/[type]",
+      "regex": "^/api/upgrade\\-batch/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPtype": "nxtPtype"
+      },
+      "namedRegex": "^/api/upgrade\\-batch/(?<nxtPtype>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/api/achievements",
+      "regex": "^/api/achievements(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/achievements(?:/)?$"
+    },
+    {
+      "page": "/api/click",
+      "regex": "^/api/click(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/click(?:/)?$"
+    },
+    {
+      "page": "/api/game",
+      "regex": "^/api/game(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/game(?:/)?$"
+    },
+    {
+      "page": "/api/game/reset",
+      "regex": "^/api/game/reset(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/game/reset(?:/)?$"
+    },
+    {
+      "page": "/api/player",
+      "regex": "^/api/player(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/player(?:/)?$"
+    },
+    {
+      "page": "/api/prestige",
+      "regex": "^/api/prestige(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/prestige(?:/)?$"
+    },
+    {
+      "page": "/api/prestige/preview",
+      "regex": "^/api/prestige/preview(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/prestige/preview(?:/)?$"
+    },
+    {
+      "page": "/api/skills",
+      "regex": "^/api/skills(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/skills(?:/)?$"
+    },
+    {
+      "page": "/api/stats",
+      "regex": "^/api/stats(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/stats(?:/)?$"
+    },
+    {
+      "page": "/api/sync",
+      "regex": "^/api/sync(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/sync(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

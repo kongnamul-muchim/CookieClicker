@@ -1,0 +1,20 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/achievements/route": "app/api/achievements/route.js",
+  "/api/click/route": "app/api/click/route.js",
+  "/api/enhance/[type]/route": "app/api/enhance/[type]/route.js",
+  "/api/game/reset/route": "app/api/game/reset/route.js",
+  "/api/game/route": "app/api/game/route.js",
+  "/api/player/route": "app/api/player/route.js",
+  "/api/prestige/preview/route": "app/api/prestige/preview/route.js",
+  "/api/prestige/route": "app/api/prestige/route.js",
+  "/api/skill/unlock/[skillId]/route": "app/api/skill/unlock/[skillId]/route.js",
+  "/api/skills/route": "app/api/skills/route.js",
+  "/api/special-enhance/[type]/route": "app/api/special-enhance/[type]/route.js",
+  "/api/stats/route": "app/api/stats/route.js",
+  "/api/sync/route": "app/api/sync/route.js",
+  "/api/upgrade-batch/[type]/route": "app/api/upgrade-batch/[type]/route.js",
+  "/api/upgrade/[type]/route": "app/api/upgrade/[type]/route.js",
+  "/page": "app/page.js"
+}

@@ -1,0 +1,3 @@
+{
+  "/api/special-enhance/[type]/route": "app/api/special-enhance/[type]/route.js"
+}
