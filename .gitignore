@@ -1,5 +1,19 @@
-.opencode/\n.superpowers/\nnul\nnode_modules/\n*.lock
+# Next.js build output
+.next/
+
+# Database
+database/backups/
+*.db
+*.db.backup
+
+# Backup files
+*.backup
+
+# Dependencies
 node_modules/
 
+# Prisma
 /src/generated/prisma
+
+# Environment
 .env
