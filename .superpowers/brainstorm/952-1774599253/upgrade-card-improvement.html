@@ -1,0 +1,147 @@
+<h2>업그레이드 카드 개선</h2>
+<p class="subtitle">어떤 개선을 원하시나요? 여러 개 선택 가능</p>
+
+<style>
+  .demo-area {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  /* 현재 스타일 */
+  .current-card {
+    background: #f0f0f0;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .current-info { flex: 1; }
+  .current-name { font-weight: bold; font-size: 16px; }
+  .current-details { color: #666; font-size: 13px; margin-top: 4px; }
+  .current-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  /* 개선된 스타일 */
+  .improved-card {
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    border: 2px solid #28a745;
+    transition: all 0.2s;
+  }
+  .improved-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40,167,69,0.2);
+  }
+  .improved-info { display: flex; align-items: center; gap: 12px; flex: 1; }
+  .improved-icon {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+  .improved-text { }
+  .improved-name { font-weight: bold; font-size: 16px; color: #333; }
+  .improved-level { color: #764ba2; font-size: 13px; }
+  .improved-details { color: #666; font-size: 12px; margin-top: 2px; }
+  .improved-btn {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 3px 10px rgba(40,167,69,0.3);
+  }
+  
+  .section-label {
+    font-size: 12px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+</style>
+
+<div class="demo-area">
+  <div>
+    <p class="section-label">현재</p>
+    <div class="current-card">
+      <div class="current-info">
+        <div class="current-name">커서 (Lv.5)</div>
+        <div class="current-details">
+          <span>초당 +0.1 쿠키</span><br>
+          <span>비용: 100개</span>
+        </div>
+      </div>
+      <button class="current-btn">+1</button>
+    </div>
+  </div>
+  
+  <div>
+    <p class="section-label">개선안</p>
+    <div class="improved-card">
+      <div class="improved-info">
+        <div class="improved-icon">👆</div>
+        <div class="improved-text">
+          <div class="improved-name">커서</div>
+          <div class="improved-level">Lv.5 → Lv.6</div>
+          <div class="improved-details">초당 +0.1 쿠키 • 비용: 100개</div>
+        </div>
+      </div>
+      <button class="improved-btn">+1</button>
+    </div>
+  </div>
+</div>
+
+<hr style="margin: 25px 0; border: none; border-top: 1px solid #ddd;">
+
+<h3>어떤 개선을 적용할까요?</h3>
+<div class="options" data-multiselect>
+  <div class="option" data-choice="icon" onclick="toggleSelect(this)">
+    <div class="letter">🎨</div>
+    <div class="content">
+      <h3>아이콘 추가</h3>
+      <p>각 업그레이드에 고유 이모지/아이콘</p>
+    </div>
+  </div>
+  <div class="option" data-choice="glow" onclick="toggleSelect(this)">
+    <div class="letter">✨</div>
+    <div class="content">
+      <h3>구매 가능 시 빛나는 테두리</h3>
+      <p>살 수 있으면 카드가 반짝임</p>
+    </div>
+  </div>
+  <div class="option" data-choice="hover" onclick="toggleSelect(this)">
+    <div class="letter">👆</div>
+    <div class="content">
+      <h3>호버 효과</h3>
+      <p>마우스 올리면 카드 살짝 떠오름</p>
+    </div>
+  </div>
+  <div class="option" data-choice="levelup" onclick="toggleSelect(this)">
+    <div class="letter">🎉</div>
+    <div class="content">
+      <h3>레벨업 애니메이션</h3>
+      <p>구매 시 반짝이/파티클 효과</p>
+    </div>
+  </div>
+</div>

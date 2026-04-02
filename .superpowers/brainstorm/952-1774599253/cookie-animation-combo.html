@@ -1,0 +1,196 @@
+<h2>A + C + D 조합 효과</h2>
+<p class="subtitle">클릭 위치에서 파티클 + 갈라짐 + 튀기</p>
+
+<style>
+  .demo-area {
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+  }
+  .demo-cookie {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  .cookie-btn {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(145deg, #f5e6d3, #d4a574);
+    font-size: 80px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: transform 0.1s;
+  }
+  
+  /* 파티클 - 클릭 위치에서 */
+  .particle {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background: #d4a574;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particleFly 0.6s ease-out forwards;
+    z-index: 1000;
+  }
+  @keyframes particleFly {
+    0% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+  }
+  
+  /* 쿠키 스프라이트 - 갈라짐용 */
+  .cookie-sprite {
+    position: absolute;
+    font-size: 80px;
+    pointer-events: none;
+  }
+  .cookie-sprite.top {
+    clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+    animation: crackTop 0.35s ease-out forwards;
+  }
+  .cookie-sprite.bottom {
+    clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
+    animation: crackBottom 0.35s ease-out forwards;
+  }
+  @keyframes crackTop {
+    0% { transform: translate(0, 0) rotate(0); }
+    40% { transform: translate(-20px, -15px) rotate(-20deg); }
+    100% { transform: translate(0, 0) rotate(0); opacity: 0; }
+  }
+  @keyframes crackBottom {
+    0% { transform: translate(0, 0) rotate(0); }
+    40% { transform: translate(20px, 15px) rotate(20deg); }
+    100% { transform: translate(0, 0) rotate(0); opacity: 0; }
+  }
+  
+  /* 튀기 */
+  .bounce {
+    animation: bounceJump 0.4s ease-out;
+  }
+  @keyframes bounceJump {
+    0% { transform: translateY(0) rotate(0deg); }
+    30% { transform: translateY(-40px) rotate(20deg); }
+    50% { transform: translateY(-25px) rotate(0deg); }
+    70% { transform: translateY(-12px) rotate(-15deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+  }
+  
+  .click-hint {
+    font-size: 14px;
+    color: #888;
+  }
+  
+  /* 반짝이 파티클 */
+  .sparkle {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background: gold;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: sparkleFly 0.5s ease-out forwards;
+    z-index: 1000;
+    box-shadow: 0 0 4px gold;
+  }
+  @keyframes sparkleFly {
+    0% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+  }
+</style>
+
+<div class="demo-area">
+  <div class="demo-cookie">
+    <button class="cookie-btn" onclick="playCombo(event, this)">🍪</button>
+    <span class="click-hint">쿠키를 여러 곳을 클릭해보세요!</span>
+  </div>
+</div>
+
+<script>
+  function playCombo(e, btn) {
+    const rect = btn.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    // 1. 클릭 위치에서 파티클
+    for (let i = 0; i < 6; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      const angle = (i / 6) * Math.PI * 2 + Math.random() * 0.5;
+      const distance = 50 + Math.random() * 40;
+      particle.style.left = e.clientX + 'px';
+      particle.style.top = e.clientY + 'px';
+      particle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+      particle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+      document.body.appendChild(particle);
+      setTimeout(() => particle.remove(), 600);
+    }
+    
+    // 반짝이도 추가
+    for (let i = 0; i < 4; i++) {
+      const sparkle = document.createElement('div');
+      sparkle.className = 'sparkle';
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 30 + Math.random() * 30;
+      sparkle.style.left = e.clientX + 'px';
+      sparkle.style.top = e.clientY + 'px';
+      sparkle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+      sparkle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+      document.body.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 500);
+    }
+    
+    // 2. 갈라짐 효과
+    const topHalf = document.createElement('div');
+    topHalf.className = 'cookie-sprite top';
+    topHalf.textContent = '🍪';
+    topHalf.style.left = rect.left + 'px';
+    topHalf.style.top = rect.top + 'px';
+    topHalf.style.width = rect.width + 'px';
+    topHalf.style.height = rect.height + 'px';
+    
+    const bottomHalf = document.createElement('div');
+    bottomHalf.className = 'cookie-sprite bottom';
+    bottomHalf.textContent = '🍪';
+    bottomHalf.style.left = rect.left + 'px';
+    bottomHalf.style.top = rect.top + 'px';
+    bottomHalf.style.width = rect.width + 'px';
+    bottomHalf.style.height = rect.height + 'px';
+    
+    document.body.appendChild(topHalf);
+    document.body.appendChild(bottomHalf);
+    setTimeout(() => { topHalf.remove(); bottomHalf.remove(); }, 350);
+    
+    // 3. 튀기 효과
+    btn.classList.remove('bounce');
+    void btn.offsetWidth;
+    btn.classList.add('bounce');
+    setTimeout(() => btn.classList.remove('bounce'), 400);
+  }
+</script>
+
+<hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+<h3>이 효과가 마음에 드시나요?</h3>
+<div class="options">
+  <div class="option" data-choice="perfect" onclick="toggleSelect(this)">
+    <div class="letter">👍</div>
+    <div class="content">
+      <h3>완벽해요!</h3>
+      <p>이대로 적용할게요</p>
+    </div>
+  </div>
+  <div class="option" data-choice="tweak" onclick="toggleSelect(this)">
+    <div class="letter">🔧</div>
+    <div class="content">
+      <h3>조금 수정하고 싶어요</h3>
+      <p>어떤 점을 바꾸고 싶은지 말씀해주세요</p>
+    </div>
+  </div>
+</div>

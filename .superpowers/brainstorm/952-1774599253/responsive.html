@@ -1,0 +1,357 @@
+<h2>모바일 반응형</h2>
+<p class="subtitle">화면 크기에 따라 레이아웃 자동 조절</p>
+
+<style>
+  .demo-area {
+    padding: 20px;
+  }
+  
+  .device-container {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .device {
+    text-align: center;
+  }
+  
+  .device-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #555;
+  }
+  
+  .phone-frame {
+    width: 180px;
+    height: 320px;
+    background: #1a1a2e;
+    border-radius: 25px;
+    padding: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  
+  .phone-screen {
+    background: linear-gradient(135deg, #1a1825, #211f2d);
+    border-radius: 18px;
+    height: 100%;
+    padding: 12px;
+    overflow: hidden;
+  }
+  
+  .phone-title {
+    color: #b8a9c9;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  
+  .phone-cookie {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(145deg, #3d3830, #2d2a25);
+    border-radius: 50%;
+    margin: 0 auto 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+  
+  .phone-stats {
+    background: #252330;
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  
+  .phone-stat {
+    color: #a098b0;
+    font-size: 10px;
+    margin: 2px 0;
+  }
+  
+  .phone-stat span { color: #c9bed8; font-weight: bold; }
+  
+  .phone-upgrade {
+    background: #252330;
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .phone-upgrade-icon {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+  
+  .phone-upgrade-name {
+    color: #c9bed8;
+    font-size: 10px;
+    font-weight: bold;
+  }
+  
+  .phone-upgrade-level {
+    color: #b8a9c9;
+    font-size: 8px;
+  }
+  
+  .phone-upgrade-btn {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 9px;
+    margin-left: auto;
+  }
+  
+  /* 데스크톱 프레임 */
+  .desktop-frame {
+    width: 320px;
+    height: 200px;
+    background: #1a1a2e;
+    border-radius: 10px;
+    padding: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  
+  .desktop-screen {
+    background: linear-gradient(135deg, #1a1825, #211f2d);
+    border-radius: 6px;
+    height: 100%;
+    padding: 10px;
+    display: flex;
+    gap: 15px;
+  }
+  
+  .desktop-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .desktop-cookie {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(145deg, #3d3830, #2d2a25);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 35px;
+    margin-bottom: 8px;
+  }
+  
+  .desktop-stats {
+    background: #252330;
+    border-radius: 6px;
+    padding: 6px;
+    text-align: center;
+    width: 100%;
+  }
+  
+  .desktop-stat {
+    color: #a098b0;
+    font-size: 9px;
+  }
+  
+  .desktop-stat span { color: #c9bed8; }
+  
+  .desktop-right {
+    flex: 1.2;
+  }
+  
+  .desktop-title {
+    color: #b8a9c9;
+    font-size: 10px;
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+  
+  .desktop-upgrade {
+    background: #252330;
+    border-radius: 6px;
+    padding: 6px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .desktop-upgrade-icon {
+    width: 22px;
+    height: 22px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+  }
+  
+  .desktop-upgrade-name {
+    color: #c9bed8;
+    font-size: 9px;
+    font-weight: bold;
+  }
+  
+  .desktop-upgrade-btn {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border: none;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 8px;
+    margin-left: auto;
+  }
+  
+  .feature-list {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+  }
+  
+  .feature-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .feature-item:last-child {
+    border-bottom: none;
+  }
+  
+  .feature-icon {
+    font-size: 20px;
+  }
+  
+  .feature-text {
+    font-size: 13px;
+    color: #333;
+  }
+</style>
+
+<div class="demo-area">
+  <div class="device-container">
+    <div class="device">
+      <p class="device-label">📱 모바일 (세로)</p>
+      <div class="phone-frame">
+        <div class="phone-screen">
+          <p class="phone-title">쿠키 클리커</p>
+          <div class="phone-cookie">🍪</div>
+          <div class="phone-stats">
+            <p class="phone-stat">쿠키: <span>1,000</span></p>
+            <p class="phone-stat">초당: <span>10</span></p>
+          </div>
+          <div class="phone-upgrade">
+            <div class="phone-upgrade-icon">👆</div>
+            <div>
+              <p class="phone-upgrade-name">커서</p>
+              <p class="phone-upgrade-level">Lv.5</p>
+            </div>
+            <button class="phone-upgrade-btn">+1</button>
+          </div>
+          <div class="phone-upgrade">
+            <div class="phone-upgrade-icon">👵</div>
+            <div>
+              <p class="phone-upgrade-name">할머니</p>
+              <p class="phone-upgrade-level">Lv.3</p>
+            </div>
+            <button class="phone-upgrade-btn">+1</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="device">
+      <p class="device-label">🖥️ 데스크톱</p>
+      <div class="desktop-frame">
+        <div class="desktop-screen">
+          <div class="desktop-left">
+            <div class="desktop-cookie">🍪</div>
+            <div class="desktop-stats">
+              <p class="desktop-stat">쿠키: <span>1,000</span></p>
+              <p class="desktop-stat">초당: <span>10</span></p>
+            </div>
+          </div>
+          <div class="desktop-right">
+            <p class="desktop-title">업그레이드</p>
+            <div class="desktop-upgrade">
+              <div class="desktop-upgrade-icon">👆</div>
+              <span class="desktop-upgrade-name">커서 Lv.5</span>
+              <button class="desktop-upgrade-btn">+1</button>
+            </div>
+            <div class="desktop-upgrade">
+              <div class="desktop-upgrade-icon">👵</div>
+              <span class="desktop-upgrade-name">할머니 Lv.3</span>
+              <button class="desktop-upgrade-btn">+1</button>
+            </div>
+            <div class="desktop-upgrade">
+              <div class="desktop-upgrade-icon">🚜</div>
+              <span class="desktop-upgrade-name">농장 Lv.2</span>
+              <button class="desktop-upgrade-btn">+1</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="feature-list">
+    <div class="feature-item">
+      <span class="feature-icon">📏</span>
+      <span class="feature-text">버튼 크기 자동 조절 (모바일에서 더 크게)</span>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">📐</span>
+      <span class="feature-text">레이아웃 자동 전환 (세로/가로)</span>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">👆</span>
+      <span class="feature-text">터치 친화적 버튼 간격</span>
+    </div>
+    <div class="feature-item">
+      <span class="feature-icon">🔤</span>
+      <span class="feature-text">폰트 크기 자동 조절</span>
+    </div>
+  </div>
+</div>
+
+<hr style="margin: 25px 0; border: none; border-top: 1px solid #ddd;">
+
+<h3>반응형 적용할까요?</h3>
+<div class="options">
+  <div class="option" data-choice="yes" onclick="toggleSelect(this)">
+    <div class="letter">✅</div>
+    <div class="content">
+      <h3>네, 적용해주세요!</h3>
+      <p>모바일에서도 편하게 플레이</p>
+    </div>
+  </div>
+  <div class="option" data-choice="no" onclick="toggleSelect(this)">
+    <div class="letter">⏭️</div>
+    <div class="content">
+      <h3>건너뛰기</h3>
+      <p>데스크톱만 고려</p>
+    </div>
+  </div>
+</div>

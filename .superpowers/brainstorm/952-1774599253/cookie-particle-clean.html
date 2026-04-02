@@ -1,0 +1,128 @@
+<h2>파티클 - 깔끔하게 수정</h2>
+<p class="subtitle">잔상 문제 해결</p>
+
+<style>
+  .demo-area {
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+  }
+  .cookie-btn {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(145deg, #f5e6d3, #d4a574);
+    font-size: 80px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s;
+  }
+  .cookie-btn:active {
+    transform: scale(0.95);
+  }
+  .click-hint {
+    font-size: 14px;
+    color: #888;
+    margin-top: 15px;
+  }
+</style>
+
+<div class="demo-area">
+  <div style="text-align: center;">
+    <button class="cookie-btn" onclick="playParticles(event)">🍪</button>
+    <p class="click-hint">연속 클릭해보세요!</p>
+  </div>
+</div>
+
+<script>
+  function playParticles(e) {
+    const colors = ['#d4a574', '#c9956a', '#b8845a', '#deb887'];
+    const x = e.clientX;
+    const y = e.clientY;
+    
+    // 부스러기
+    for (let i = 0; i < 10; i++) {
+      setTimeout(() => {
+        const crumb = document.createElement('div');
+        const size = 6 + Math.random() * 8;
+        crumb.style.cssText = `
+          position: fixed;
+          width: ${size}px;
+          height: ${size}px;
+          background: ${colors[Math.floor(Math.random() * colors.length)]};
+          border-radius: 50%;
+          left: ${x}px;
+          top: ${y}px;
+          pointer-events: none;
+          z-index: 1000;
+        `;
+        document.body.appendChild(crumb);
+        
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 30 + Math.random() * 50;
+        
+        crumb.animate([
+          { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+          { transform: `translate(calc(-50% + ${Math.cos(angle) * dist}px), calc(-50% + ${Math.sin(angle) * dist + 20}px)) scale(0.2)`, opacity: 0 }
+        ], { duration: 300, easing: 'ease-out', fill: 'forwards' });
+        
+        setTimeout(() => crumb.remove(), 300);
+      }, i * 5);
+    }
+    
+    // 반짝이
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => {
+        const sp = document.createElement('div');
+        const size = 4 + Math.random() * 4;
+        sp.style.cssText = `
+          position: fixed;
+          width: ${size}px;
+          height: ${size}px;
+          background: gold;
+          border-radius: 50%;
+          box-shadow: 0 0 6px gold;
+          left: ${x}px;
+          top: ${y}px;
+          pointer-events: none;
+          z-index: 1000;
+        `;
+        document.body.appendChild(sp);
+        
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 40 + Math.random() * 30;
+        
+        sp.animate([
+          { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+          { transform: `translate(calc(-50% + ${Math.cos(angle) * dist}px), calc(-50% + ${Math.sin(angle) * dist}px)) scale(0)`, opacity: 0 }
+        ], { duration: 250, easing: 'ease-out', fill: 'forwards' });
+        
+        setTimeout(() => sp.remove(), 250);
+      }, i * 3);
+    }
+  }
+</script>
+
+<hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+<h3>잔상 없어졌나요?</h3>
+<div class="options">
+  <div class="option" data-choice="good" onclick="toggleSelect(this)">
+    <div class="letter">👍</div>
+    <div class="content">
+      <h3>해결됨!</h3>
+      <p>이걸로 적용</p>
+    </div>
+  </div>
+  <div class="option" data-choice="bad" onclick="toggleSelect(this)">
+    <div class="letter">❌</div>
+    <div class="content">
+      <h3>아직 문제 있음</h3>
+      <p>설명해주세요</p>
+    </div>
+  </div>
+</div>

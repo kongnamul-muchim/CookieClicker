@@ -1,0 +1,157 @@
+<h2>파티클 최적화 버전</h2>
+<p class="subtitle">빠른 클릭해도 버벅이지 않음</p>
+
+<style>
+  .demo-area {
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+  }
+  .cookie-btn {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(145deg, #f5e6d3, #d4a574);
+    font-size: 80px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.1s;
+    will-change: transform;
+  }
+  .cookie-btn:active {
+    transform: scale(0.95);
+  }
+  
+  .click-hint {
+    font-size: 14px;
+    color: #888;
+    margin-top: 15px;
+  }
+</style>
+
+<div class="demo-area">
+  <div style="text-align: center;">
+    <button class="cookie-btn" onclick="playParticles(event)">🍪</button>
+    <p class="click-hint">빠르게 연속 클릭해보세요!</p>
+  </div>
+</div>
+
+<script>
+  // 파티클 풀 - 재사용해서 성능 향상
+  const particlePool = [];
+  const maxParticles = 50;
+  let activeCount = 0;
+  
+  function getParticle() {
+    if (particlePool.length > 0) {
+      return particlePool.pop();
+    }
+    const p = document.createElement('div');
+    p.style.cssText = 'position:fixed;pointer-events:none;z-index:1000;will-change:transform,opacity;';
+    return p;
+  }
+  
+  function returnParticle(p) {
+    p.remove();
+    if (particlePool.length < maxParticles) {
+      particlePool.push(p);
+    }
+  }
+  
+  function playParticles(e) {
+    // 활성 파티클 제한
+    if (activeCount > 30) return;
+    
+    const colors = ['#d4a574', '#c9956a', '#b8845a', '#deb887', '#f5deb3'];
+    const x = e.clientX;
+    const y = e.clientY;
+    
+    // 부스러기 (줄임)
+    for (let i = 0; i < 12; i++) {
+      const crumb = getParticle();
+      const size = 5 + Math.random() * 8;
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      
+      crumb.style.width = size + 'px';
+      crumb.style.height = size + 'px';
+      crumb.style.background = color;
+      crumb.style.borderRadius = '50%';
+      crumb.style.left = x + 'px';
+      crumb.style.top = y + 'px';
+      crumb.style.opacity = '1';
+      crumb.style.transform = 'translate(0, 0)';
+      
+      document.body.appendChild(crumb);
+      activeCount++;
+      
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 30 + Math.random() * 60;
+      const endX = Math.cos(angle) * dist;
+      const endY = Math.sin(angle) * dist + 20;
+      
+      crumb.animate([
+        { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+        { transform: `translate(${endX}px, ${endY}px) scale(0.2)`, opacity: 0 }
+      ], { duration: 350, easing: 'ease-out' });
+      
+      setTimeout(() => {
+        returnParticle(crumb);
+        activeCount--;
+      }, 350);
+    }
+    
+    // 반짝이 (줄임)
+    for (let i = 0; i < 5; i++) {
+      const sp = getParticle();
+      const size = 3 + Math.random() * 5;
+      
+      sp.style.width = size + 'px';
+      sp.style.height = size + 'px';
+      sp.style.background = 'gold';
+      sp.style.borderRadius = '50%';
+      sp.style.boxShadow = '0 0 6px gold';
+      sp.style.left = x + 'px';
+      sp.style.top = y + 'px';
+      
+      document.body.appendChild(sp);
+      activeCount++;
+      
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 40 + Math.random() * 40;
+      
+      sp.animate([
+        { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+        { transform: `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px) scale(0)`, opacity: 0 }
+      ], { duration: 300, easing: 'ease-out' });
+      
+      setTimeout(() => {
+        returnParticle(sp);
+        activeCount--;
+      }, 300);
+    }
+  }
+</script>
+
+<hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+<h3>어때요?</h3>
+<div class="options">
+  <div class="option" data-choice="good" onclick="toggleSelect(this)">
+    <div class="letter">👍</div>
+    <div class="content">
+      <h3>좋아요!</h3>
+      <p>이걸로 적용</p>
+    </div>
+  </div>
+  <div class="option" data-choice="tweak" onclick="toggleSelect(this)">
+    <div class="letter">🔧</div>
+    <div class="content">
+      <h3>수정 원함</h3>
+      <p>원하는 대로 말씀해주세요</p>
+    </div>
+  </div>
+</div>

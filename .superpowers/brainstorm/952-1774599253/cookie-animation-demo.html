@@ -1,0 +1,222 @@
+<h2>쿠키 클릭 애니메이션 미리보기</h2>
+<p class="subtitle">각 쿠키를 클릭해서 효과를 확인하세요!</p>
+
+<style>
+  .demo-area {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 40px;
+    padding: 30px;
+  }
+  .demo-cookie {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  .demo-cookie p {
+    font-weight: bold;
+    color: #333;
+  }
+  .cookie-btn {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(145deg, #f5e6d3, #d4a574);
+    font-size: 50px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: transform 0.1s;
+  }
+  
+  /* A. 파티클 효과 */
+  .particle-container {
+    position: relative;
+  }
+  .particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #d4a574;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particleFly 0.6s ease-out forwards;
+  }
+  @keyframes particleFly {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0); }
+  }
+  
+  /* B. 리플 효과 */
+  .ripple-cookie {
+    position: relative;
+    overflow: visible;
+  }
+  .ripple {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid #d4a574;
+    animation: rippleExpand 0.6s ease-out forwards;
+    pointer-events: none;
+  }
+  @keyframes rippleExpand {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.5); opacity: 0; }
+  }
+  
+  /* C. 갈라짐 효과 */
+  .crack-cookie.cracked {
+    animation: crackShake 0.3s ease-out;
+  }
+  .crack-cookie.cracked::before,
+  .crack-cookie.cracked::after {
+    content: '🍪';
+    position: absolute;
+    font-size: 50px;
+    animation: crackSplit 0.4s ease-out forwards;
+  }
+  .crack-cookie.cracked::before {
+    clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+    animation: crackLeft 0.4s ease-out forwards;
+  }
+  .crack-cookie.cracked::after {
+    clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
+    animation: crackRight 0.4s ease-out forwards;
+  }
+  @keyframes crackLeft {
+    0% { transform: translate(0, 0) rotate(0); }
+    50% { transform: translate(-15px, -10px) rotate(-15deg); }
+    100% { transform: translate(0, 0) rotate(0); }
+  }
+  @keyframes crackRight {
+    0% { transform: translate(0, 0) rotate(0); }
+    50% { transform: translate(15px, 10px) rotate(15deg); }
+    100% { transform: translate(0, 0) rotate(0); }
+  }
+  
+  /* D. 튀기 효과 */
+  .bounce-cookie.bouncing {
+    animation: bounceJump 0.4s ease-out;
+  }
+  @keyframes bounceJump {
+    0% { transform: translateY(0) rotate(0deg); }
+    30% { transform: translateY(-30px) rotate(15deg); }
+    50% { transform: translateY(-20px) rotate(0deg); }
+    70% { transform: translateY(-10px) rotate(-10deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+  }
+  
+  .click-hint {
+    font-size: 12px;
+    color: #888;
+  }
+</style>
+
+<div class="demo-area">
+  <div class="demo-cookie">
+    <div class="particle-container">
+      <button class="cookie-btn" onclick="playParticle(this)">🍪</button>
+    </div>
+    <p>A. 파티클</p>
+    <span class="click-hint">클릭!</span>
+  </div>
+  
+  <div class="demo-cookie">
+    <button class="cookie-btn ripple-cookie" onclick="playRipple(this)">🍪</button>
+    <p>B. 리플</p>
+    <span class="click-hint">클릭!</span>
+  </div>
+  
+  <div class="demo-cookie">
+    <button class="cookie-btn crack-cookie" onclick="playCrack(this)">🍪</button>
+    <p>C. 갈라짐</p>
+    <span class="click-hint">클릭!</span>
+  </div>
+  
+  <div class="demo-cookie">
+    <button class="cookie-btn bounce-cookie" onclick="playBounce(this)">🍪</button>
+    <p>D. 튀기</p>
+    <span class="click-hint">클릭!</span>
+  </div>
+</div>
+
+<script>
+  function playParticle(btn) {
+    const container = btn.parentElement;
+    for (let i = 0; i < 8; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      const angle = (i / 8) * Math.PI * 2;
+      const distance = 40 + Math.random() * 30;
+      particle.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
+      particle.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
+      particle.style.left = '50%';
+      particle.style.top = '50%';
+      container.appendChild(particle);
+      setTimeout(() => particle.remove(), 600);
+    }
+  }
+  
+  function playRipple(btn) {
+    const ripple = document.createElement('div');
+    ripple.className = 'ripple';
+    btn.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+  }
+  
+  function playCrack(btn) {
+    btn.classList.remove('cracked');
+    void btn.offsetWidth;
+    btn.classList.add('cracked');
+    setTimeout(() => btn.classList.remove('cracked'), 400);
+  }
+  
+  function playBounce(btn) {
+    btn.classList.remove('bouncing');
+    void btn.offsetWidth;
+    btn.classList.add('bouncing');
+    setTimeout(() => btn.classList.remove('bouncing'), 400);
+  }
+</script>
+
+<hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+
+<h3>어떤 효과가 마음에 드셨나요?</h3>
+<div class="options" data-multiselect>
+  <div class="option" data-choice="particles" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>파티클 효과</h3>
+      <p>쿠키 조각이 튀어나옴</p>
+    </div>
+  </div>
+  <div class="option" data-choice="ripple" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>리플 효과</h3>
+      <p>원형 파동이 퍼짐</p>
+    </div>
+  </div>
+  <div class="option" data-choice="crack" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>갈라짐 효과</h3>
+      <p>쿠키가 갈라졌다 합쳐짐</p>
+    </div>
+  </div>
+  <div class="option" data-choice="bounce" onclick="toggleSelect(this)">
+    <div class="letter">D</div>
+    <div class="content">
+      <h3>튀기 효과</h3>
+      <p>위로 튀어오르며 회전</p>
+    </div>
+  </div>
+</div>

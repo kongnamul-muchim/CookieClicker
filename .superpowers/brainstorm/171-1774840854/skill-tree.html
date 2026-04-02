@@ -1,0 +1,263 @@
+<h2>🍪 프레스티지 스킬 트리</h2>
+<p class="subtitle">특수 재화(⭐)로 영구 업그레이드 해금</p>
+
+<style>
+  .skill-tree {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    gap: 30px;
+  }
+  
+  .tier {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .skill-node {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    font-size: 12px;
+    text-align: center;
+    padding: 10px;
+  }
+  
+  .skill-node.available {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+  }
+  
+  .skill-node.locked {
+    background: #444;
+    color: #888;
+    opacity: 0.5;
+  }
+  
+  .skill-node.unlocked {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    box-shadow: 0 0 25px rgba(40, 167, 69, 0.6);
+  }
+  
+  .skill-node:hover {
+    transform: scale(1.1);
+  }
+  
+  .skill-icon {
+    font-size: 28px;
+    margin-bottom: 5px;
+  }
+  
+  .skill-name {
+    font-weight: bold;
+    font-size: 10px;
+  }
+  
+  .skill-cost {
+    font-size: 9px;
+    margin-top: 3px;
+  }
+  
+  .connector {
+    width: 3px;
+    height: 30px;
+    background: #666;
+  }
+  
+  .connector-h {
+    width: 60px;
+    height: 3px;
+    background: #666;
+    position: absolute;
+    top: 50%;
+    left: -60px;
+  }
+  
+  .tier-label {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  
+  .tree-section {
+    text-align: center;
+  }
+  
+  .branch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .branches {
+    display: flex;
+    gap: 80px;
+    justify-content: center;
+  }
+  
+  .branch-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #764ba2;
+    margin-bottom: 15px;
+  }
+</style>
+
+<div class="skill-tree">
+  <div class="tier-label">⭐ 시작점 (비용: 10)</div>
+  <div class="tier">
+    <div class="skill-node available" onclick="toggleSelect(this)">
+      <div class="skill-icon">🏠</div>
+      <div class="skill-name">시작</div>
+      <div class="skill-cost">10⭐</div>
+    </div>
+  </div>
+  
+  <div class="connector"></div>
+  
+  <div class="branches">
+    <div class="branch">
+      <div class="branch-title">⚔️ 공격</div>
+      <div class="tier">
+        <div class="skill-node available" onclick="toggleSelect(this)">
+          <div class="skill-icon">👆</div>
+          <div class="skill-name">클릭 강화</div>
+          <div class="skill-cost">20⭐</div>
+        </div>
+        <div class="skill-node available" onclick="toggleSelect(this)">
+          <div class="skill-icon">💥</div>
+          <div class="skill-name">크리티컬</div>
+          <div class="skill-cost">20⭐</div>
+        </div>
+      </div>
+      <div class="connector"></div>
+      <div class="tier">
+        <div class="skill-node locked" onclick="toggleSelect(this)">
+          <div class="skill-icon">🖱️</div>
+          <div class="skill-name">자동 클릭</div>
+          <div class="skill-cost">50⭐</div>
+        </div>
+        <div class="skill-node locked" onclick="toggleSelect(this)">
+          <div class="skill-icon">⚡</div>
+          <div class="skill-name">클릭 배율</div>
+          <div class="skill-cost">50⭐</div>
+        </div>
+      </div>
+      <div class="connector"></div>
+      <div class="tier">
+        <div class="skill-node locked" onclick="toggleSelect(this)">
+          <div class="skill-icon">🔥</div>
+          <div class="skill-name">버닝</div>
+          <div class="skill-cost">100⭐</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="branch">
+      <div class="branch-title">🏭 생산</div>
+      <div class="tier">
+        <div class="skill-node available" onclick="toggleSelect(this)">
+          <div class="skill-icon">📈</div>
+          <div class="skill-name">CPS 증가</div>
+          <div class="skill-cost">20⭐</div>
+        </div>
+        <div class="skill-node available" onclick="toggleSelect(this)">
+          <div class="skill-icon">💰</div>
+          <div class="skill-name">비용 감소</div>
+          <div class="skill-cost">20⭐</div>
+        </div>
+      </div>
+      <div class="connector"></div>
+      <div class="tier">
+        <div class="skill-node locked" onclick="toggleSelect(this)">
+          <div class="skill-icon">🌙</div>
+          <div class="skill-name">오프라인</div>
+          <div class="skill-cost">50⭐</div>
+        </div>
+        <div class="skill-node locked" onclick="toggleSelect(this)">
+          <div class="skill-icon">🏦</div>
+          <div class="skill-name">이자</div>
+          <div class="skill-cost">50⭐</div>
+        </div>
+      </div>
+      <div class="connector"></div>
+      <div class="tier">
+        <div class="skill-node locked" onclick="toggleSelect(this)">
+          <div class="skill-icon">🚀</div>
+          <div class="skill-name">대량 생산</div>
+          <div class="skill-cost">100⭐</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="branch">
+      <div class="branch-title">✨ 특수</div>
+      <div class="tier">
+        <div class="skill-node available" onclick="toggleSelect(this)">
+          <div class="skill-icon">🎁</div>
+          <div class="skill-name">시작 보너스</div>
+          <div class="skill-cost">20⭐</div>
+        </div>
+        <div class="skill-node available" onclick="toggleSelect(this)">
+          <div class="skill-icon">⏱️</div>
+          <div class="skill-name">강화 보너스</div>
+          <div class="skill-cost">20⭐</div>
+        </div>
+      </div>
+      <div class="connector"></div>
+      <div class="tier">
+        <div class="skill-node locked" onclick="toggleSelect(this)">
+          <div class="skill-icon">🍀</div>
+          <div class="skill-name">행운</div>
+          <div class="skill-cost">50⭐</div>
+        </div>
+        <div class="skill-node locked" onclick="toggleSelect(this)">
+          <div class="skill-icon">💎</div>
+          <div class="skill-name">특수 강화</div>
+          <div class="skill-cost">50⭐</div>
+        </div>
+      </div>
+      <div class="connector"></div>
+      <div class="tier">
+        <div class="skill-node locked" onclick="toggleSelect(this)">
+          <div class="skill-icon">👑</div>
+          <div class="skill-name">마스터리</div>
+          <div class="skill-cost">100⭐</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr style="margin: 25px 0; border: none; border-top: 1px solid #ddd;">
+
+<h3>이런 구조 어때요?</h3>
+<div class="options">
+  <div class="option" data-choice="good" onclick="toggleSelect(this)">
+    <div class="letter">👍</div>
+    <div class="content">
+      <h3>완벽!</h3>
+      <p>이 구조로 진행</p>
+    </div>
+  </div>
+  <div class="option" data-choice="modify" onclick="toggleSelect(this)">
+    <div class="letter">🔧</div>
+    <div class="content">
+      <h3>수정 원함</h3>
+      <p>변경하고 싶은 점 말씀해주세요</p>
+    </div>
+  </div>
+</div>

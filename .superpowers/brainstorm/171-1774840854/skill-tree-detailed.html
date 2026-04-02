@@ -1,0 +1,615 @@
+<h2>🍪 프레스티지 스킬 트리 (상세 설명)</h2>
+<p class="subtitle">각 스킬에 자세한 설명 추가!</p>
+
+<style>
+  .popup-preview {
+    width: 420px;
+    height: 400px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border-radius: 15px;
+    margin: 0 auto;
+    padding: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  
+  .popup-preview::-webkit-scrollbar { width: 5px; }
+  .popup-preview::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 3px; }
+  .popup-preview::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+  
+  .popup-title {
+    color: #b8a9c9;
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 6px;
+    position: sticky;
+    top: 0;
+    background: #1a1a2e;
+    padding: 3px 0;
+    z-index: 10;
+  }
+  
+  .stars-display {
+    text-align: center;
+    color: gold;
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+  
+  .tier-section {
+    margin-bottom: 20px;
+  }
+  
+  .tier-label {
+    color: #666;
+    font-size: 8px;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  
+  .tier-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+  
+  .skill-node {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    font-size: 10px;
+  }
+  
+  .skill-node.unlocked {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    box-shadow: 0 0 8px rgba(40, 167, 69, 0.4);
+  }
+  
+  .skill-node.available {
+    background: linear-gradient(135deg, #0066cc, #0099ff);
+    box-shadow: 0 0 8px rgba(0, 102, 204, 0.3);
+  }
+  
+  .skill-node.locked {
+    background: rgba(60, 60, 60, 0.4);
+    border: 1px dashed rgba(100, 100, 100, 0.3);
+  }
+  
+  .skill-node.root {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.4);
+  }
+  
+  .skill-node:hover {
+    transform: scale(1.2);
+    z-index: 100;
+  }
+  
+  .skill-icon { font-size: 16px; }
+  
+  .tooltip {
+    position: absolute;
+    top: 44px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 10, 20, 0.98);
+    color: white;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 9px;
+    width: 180px;
+    text-align: left;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    border: 1px solid rgba(255,255,255,0.15);
+    line-height: 1.4;
+  }
+  
+  .tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-bottom-color: rgba(10, 10, 20, 0.98);
+  }
+  
+  .skill-node:hover .tooltip { opacity: 1; }
+  
+  .tooltip-title { font-weight: bold; font-size: 11px; color: #7bed9f; margin-bottom: 4px; }
+  .tooltip-desc { color: #ccc; font-size: 9px; margin-bottom: 4px; }
+  .tooltip-cost { color: gold; font-size: 9px; margin-bottom: 2px; }
+  .tooltip-req { color: #ff6b6b; font-size: 8px; margin-bottom: 2px; }
+  .tooltip-effect { color: #70a1ff; font-size: 9px; border-top: 1px solid #333; margin-top: 4px; padding-top: 4px; }
+  
+  .legend {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 10px;
+    font-size: 9px;
+    color: #888;
+  }
+  .legend-item { display: flex; align-items: center; gap: 3px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+</style>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background: #28a745;"></div> 해금</div>
+  <div class="legend-item"><div class="legend-dot" style="background: #0066cc;"></div> 가능</div>
+  <div class="legend-item"><div class="legend-dot" style="background: #444; border: 1px dashed #666;"></div> 잠김</div>
+</div>
+
+<div class="popup-preview">
+  <div class="popup-title">⭐ 프레스티지 스킬 트리 (20티어)</div>
+  <div class="stars-display">보유: 150⭐ | 해금: 1/50</div>
+
+  <!-- 티어 1 -->
+  <div class="tier-section">
+    <div class="tier-label">티어 1 - 시작점</div>
+    <div class="tier-row">
+      <div class="skill-node root unlocked"><div class="skill-icon">🏠</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🏠 프레스티지 시작</div>
+          <div class="tooltip-desc">모든 프레스티지의 시작점입니다. 첫 번째 프레스티지 후 자동으로 해금됩니다.</div>
+          <div class="tooltip-cost">비용: 10⭐</div>
+          <div class="tooltip-effect">✅ 자동 해금됨</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 티어 2 -->
+  <div class="tier-section">
+    <div class="tier-label">티어 2 - 기본 강화</div>
+    <div class="tier-row">
+      <div class="skill-node available"><div class="skill-icon">👆</div>
+        <div class="tooltip">
+          <div class="tooltip-title">👆 클릭 강화 I</div>
+          <div class="tooltip-desc">클릭으로 얻는 쿠키가 영구적으로 증가합니다. 모든 프레스티지에 적용!</div>
+          <div class="tooltip-cost">비용: 15⭐</div>
+          <div class="tooltip-effect">✨ 클릭 데미지 +10%</div>
+        </div>
+      </div>
+      <div class="skill-node available"><div class="skill-icon">📈</div>
+        <div class="tooltip">
+          <div class="tooltip-title">📈 생산력 강화 I</div>
+          <div class="tooltip-desc">초당 자동 생산량이 영구적으로 증가합니다. 방치 플레이에 필수!</div>
+          <div class="tooltip-cost">비용: 15⭐</div>
+          <div class="tooltip-effect">✨ CPS +10%</div>
+        </div>
+      </div>
+      <div class="skill-node available"><div class="skill-icon">💰</div>
+        <div class="tooltip">
+          <div class="tooltip-title">💰 비용 할인 I</div>
+          <div class="tooltip-desc">모든 업그레이드의 구매 비용이 영구적으로 감소합니다.</div>
+          <div class="tooltip-cost">비용: 15⭐</div>
+          <div class="tooltip-effect">✨ 비용 -5%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 티어 3 -->
+  <div class="tier-section">
+    <div class="tier-label">티어 3 - 특수 능력</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">💥</div>
+        <div class="tooltip">
+          <div class="tooltip-title">💥 크리티컬 클릭</div>
+          <div class="tooltip-desc">클릭 시 일정 확률로 크리티컬이 발동하여 3배의 데미지를 입힙니다!</div>
+          <div class="tooltip-cost">비용: 25⭐</div>
+          <div class="tooltip-req">🔒 필요: 클릭강화 + 생산력강화</div>
+          <div class="tooltip-effect">✨ 5% 확률로 3배 데미지</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">🏦</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🏦 쿠키 이자</div>
+          <div class="tooltip-desc">현재 보유한 쿠키의 일정 비율을 매초 추가로 획득합니다. 쿠키가 많을수록 좋아요!</div>
+          <div class="tooltip-cost">비용: 25⭐</div>
+          <div class="tooltip-req">🔒 필요: 생산력강화 + 비용할인</div>
+          <div class="tooltip-effect">✨ 초당 보유 쿠키의 +0.1%</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">🖱️</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🖱️ 자동 클릭</div>
+          <div class="tooltip-desc">매초 자동으로 클릭을 수행합니다. AFK 중에도 쿠키가 쌓여요!</div>
+          <div class="tooltip-cost">비용: 25⭐</div>
+          <div class="tooltip-req">🔒 필요: 클릭강화 + 비용할인</div>
+          <div class="tooltip-effect">✨ 초당 1회 자동 클릭</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 티어 4 -->
+  <div class="tier-section">
+    <div class="tier-label">티어 4 - 고급 강화</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">🍀</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🍀 행운의 상</div>
+          <div class="tooltip-desc">모든 확률 기반 효과의 발동 확률이 증가합니다. 크리티컬과 연계!</div>
+          <div class="tooltip-cost">비용: 30⭐</div>
+          <div class="tooltip-req">🔒 필요: 크리티컬 + 이자</div>
+          <div class="tooltip-effect">✨ 확률 효과 +10%p</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">⏱️</div>
+        <div class="tooltip">
+          <div class="tooltip-title">⏱️ 강화 보너스</div>
+          <div class="tooltip-desc">10레벨마다 하는 강화의 효과가 더 커집니다. 스택 효과!</div>
+          <div class="tooltip-cost">비용: 30⭐</div>
+          <div class="tooltip-req">🔒 필요: 크리티컬 + 자동클릭</div>
+          <div class="tooltip-effect">✨ 강화 효과 +30%</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">🎁</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🎁 시작 보너스</div>
+          <div class="tooltip-desc">프레스티지 후 처음 시작할 때 무료 쿠키를 받습니다. 빠른 시작!</div>
+          <div class="tooltip-cost">비용: 30⭐</div>
+          <div class="tooltip-req">🔒 필요: 이자 + 자동클릭</div>
+          <div class="tooltip-effect">✨ 시작 시 1,000 쿠키</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">💎</div>
+        <div class="tooltip">
+          <div class="tooltip-title">💎 특별 강화 할인</div>
+          <div class="tooltip-desc">100레벨 도달 시 가능한 특별 강화의 비용이 감소합니다.</div>
+          <div class="tooltip-cost">비용: 30⭐</div>
+          <div class="tooltip-req">🔒 필요: 이자 + 크리티컬</div>
+          <div class="tooltip-effect">✨ 특별 강화 비용 -20%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 티어 5 -->
+  <div class="tier-section">
+    <div class="tier-label">티어 5 - 에너지</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">🔥</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🔥 버닝 클릭</div>
+          <div class="tooltip-desc">연속으로 클릭할 때마다 데미지가 조금씩 증가합니다. 최대 10회 중첩!</div>
+          <div class="tooltip-cost">비용: 40⭐</div>
+          <div class="tooltip-req">🔒 필요: 행운 + 강화보너스 + 시작보너스</div>
+          <div class="tooltip-effect">✨ 연속 클릭당 +5% (최대 +50%)</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">⚡</div>
+        <div class="tooltip">
+          <div class="tooltip-title">⚡ 번개의 일격</div>
+          <div class="tooltip-desc">낮은 확률로 번개가 떨어져 대량의 쿠키를 획득합니다!</div>
+          <div class="tooltip-cost">비용: 40⭐</div>
+          <div class="tooltip-req">🔒 필요: 행운 + 특별강화 + 시작보너스</div>
+          <div class="tooltip-effect">✨ 1% 확률로 10배 획득</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">🌟</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🌟 별의 가호</div>
+          <div class="tooltip-desc">모든 효과에 작은 보너스가 추가됩니다. 만능 스킬!</div>
+          <div class="tooltip-cost">비용: 40⭐</div>
+          <div class="tooltip-req">🔒 필요: 강화보너스 + 특별강화 + 시작보너스</div>
+          <div class="tooltip-effect">✨ 모든 효과 +10%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 티어 6 -->
+  <div class="tier-section">
+    <div class="tier-label">티어 6 - 프레스티지 강화</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">🌀</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🌀 리셋 보너스</div>
+          <div class="tooltip-desc">프레스티지 시 얻는 특수 재화(⭐)가 증가합니다. 더 빠른 성장!</div>
+          <div class="tooltip-cost">비용: 50⭐</div>
+          <div class="tooltip-req">🔒 필요: 버닝 + 번개</div>
+          <div class="tooltip-effect">✨ ⭐ 획득량 +50%</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">💫</div>
+        <div class="tooltip">
+          <div class="tooltip-title">💫 더블 찬스</div>
+          <div class="tooltip-desc">모든 획득이 2배가 될 확률이 생깁니다. 행운의 중첩!</div>
+          <div class="tooltip-cost">비용: 50⭐</div>
+          <div class="tooltip-req">🔒 필요: 번개 + 스타</div>
+          <div class="tooltip-effect">✨ 3% 확률로 획득 2배</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">🎪</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🎪 카니발</div>
+          <div class="tooltip-desc">매초 랜덤한 배율로 쿠키를 획득합니다. 운이 좋으면 대박!</div>
+          <div class="tooltip-cost">비용: 50⭐</div>
+          <div class="tooltip-req">🔒 필요: 버닝 + 스타</div>
+          <div class="tooltip-effect">✨ 랜덤 1~5배 획득</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 티어 7 -->
+  <div class="tier-section">
+    <div class="tier-label">티어 7 - 정밀</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">🎯</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🎯 정확한 타격</div>
+          <div class="tooltip-desc">클릭의 정확도가 올라가 크리티컬 데미지가 증가합니다.</div>
+          <div class="tooltip-cost">비용: 60⭐</div>
+          <div class="tooltip-effect">✨ 크리티컬 데미지 +50%</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">🎰</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🎰 잭팟</div>
+          <div class="tooltip-desc">매우 낮은 확률로 엄청난 잭팟이 터집니다!</div>
+          <div class="tooltip-cost">비용: 60⭐</div>
+          <div class="tooltip-effect">✨ 0.1% 확률로 100배</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">🌙</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🌙 달빛 축복</div>
+          <div class="tooltip-desc">밤 시간(22:00~06:00)에 모든 효과가 증가합니다.</div>
+          <div class="tooltip-cost">비용: 60⭐</div>
+          <div class="tooltip-effect">✨ 밤에 전체 +20%</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">☀️</div>
+        <div class="tooltip">
+          <div class="tooltip-title">☀️ 태양의 힘</div>
+          <div class="tooltip-desc">낮 시간(06:00~22:00)에 모든 효과가 증가합니다.</div>
+          <div class="tooltip-cost">비용: 60⭐</div>
+          <div class="tooltip-effect">✨ 낮에 전체 +15%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 티어 8 -->
+  <div class="tier-section">
+    <div class="tier-label">티어 8 - 게임</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">🎲</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🎲 주사위</div>
+          <div class="tooltip-desc">매 클릭마다 1~6의 랜덤 보너스가 적용됩니다.</div>
+          <div class="tooltip-cost">비용: 70⭐</div>
+          <div class="tooltip-effect">✨ 클릭당 1~6배 랜덤</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">🎪</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🎪 서커스</div>
+          <div class="tooltip-desc">연속 클릭 콤보가 더 강력해집니다!</div>
+          <div class="tooltip-cost">비용: 70⭐</div>
+          <div class="tooltip-effect">✨ 콤보 최대 +100%</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">🎭</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🎭 가면</div>
+          <div class="tooltip-desc">랜덤으로 다른 스킬의 효과를 복사합니다.</div>
+          <div class="tooltip-cost">비용: 70⭐</div>
+          <div class="tooltip-effect">✨ 10% 확률로 랜덤 스킬 효과</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 티어 9 -->
+  <div class="tier-section">
+    <div class="tier-label">티어 9 - 우주</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">🚀</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🚀 부스터</div>
+          <div class="tooltip-desc">30초간 모든 효과가 대폭 증가합니다. 쿨타임 5분.</div>
+          <div class="tooltip-cost">비용: 80⭐</div>
+          <div class="tooltip-effect">✨ 30초간 전체 +100%</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">🛸</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🛸 UFO 납치</div>
+          <div class="tooltip-desc">랜덤으로 쿠키를 '납치'해 추가로 획득합니다.</div>
+          <div class="tooltip-cost">비용: 80⭐</div>
+          <div class="tooltip-effect">✨ 5% 확률로 추가 50%</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">🛰️</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🛰️ 위성</div>
+          <div class="tooltip-desc">전역에서 CPS가 자동으로 수집됩니다.</div>
+          <div class="tooltip-cost">비용: 80⭐</div>
+          <div class="tooltip-effect">✨ CPS +25%</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">🌌</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🌌 은하</div>
+          <div class="tooltip-desc">모든 생산 건물이 별의 힘을 얻습니다.</div>
+          <div class="tooltip-cost">비용: 80⭐</div>
+          <div class="tooltip-effect">✨ 건물당 CPS +5%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 티어 10 -->
+  <div class="tier-section">
+    <div class="tier-label">티어 10 - 별</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">⭐</div>
+        <div class="tooltip">
+          <div class="tooltip-title">⭐ 작은 별</div>
+          <div class="tooltip-desc">별이 되어 모든 효과에 작은 보너스를 줍니다.</div>
+          <div class="tooltip-cost">비용: 100⭐</div>
+          <div class="tooltip-effect">✨ 전체 +5%</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">🌟</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🌟 빛나는 별</div>
+          <div class="tooltip-desc">더 밝은 별이 되어 더 큰 보너스를 줍니다.</div>
+          <div class="tooltip-cost">비용: 100⭐</div>
+          <div class="tooltip-effect">✨ 전체 +10%</div>
+        </div>
+      </div>
+      <div class="skill-node locked"><div class="skill-icon">✨</div>
+        <div class="tooltip">
+          <div class="tooltip-title">✨ 반짝임</div>
+          <div class="tooltip-desc">일정 확률로 별이 반짝여 보너스를 줍니다.</div>
+          <div class="tooltip-cost">비용: 100⭐</div>
+          <div class="tooltip-effect">✨ 10% 확률로 +50%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 티어 11-15 요약 -->
+  <div class="tier-section">
+    <div class="tier-label">티어 11 - 보석</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">🔮</div><div class="tooltip"><div class="tooltip-title">🔮 수정구슬</div><div class="tooltip-desc">미래를 보아 프레스티지 보너스 미리보기</div><div class="tooltip-cost">120⭐</div><div class="tooltip-effect">✨ 예상 ⭐ 표시</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">📿</div><div class="tooltip"><div class="tooltip-title">📿 목걸이</div><div class="tooltip-desc">장착하여 CPS 영구 증가</div><div class="tooltip-cost">120⭐</div><div class="tooltip-effect">✨ CPS +20%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">💍</div><div class="tooltip"><div class="tooltip-title">💍 반지</div><div class="tooltip-desc">장착하여 클릭 데미지 영구 증가</div><div class="tooltip-cost">120⭐</div><div class="tooltip-effect">✨ 클릭 +20%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">👑</div><div class="tooltip"><div class="tooltip-title">👑 왕관</div><div class="tooltip-desc">왕의 권능으로 모든 효과 증가</div><div class="tooltip-cost">120⭐</div><div class="tooltip-effect">✨ 전체 +15%</div></div></div>
+    </div>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-label">티어 12 - 전사</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">⚔️</div><div class="tooltip"><div class="tooltip-title">⚔️ 전설의 검</div><div class="tooltip-desc">공격력이 영구 증가합니다</div><div class="tooltip-cost">140⭐</div><div class="tooltip-effect">✨ 클릭 +40%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">🛡️</div><div class="tooltip"><div class="tooltip-title">🛡️ 방패</div><div class="tooltip-desc">방어로 비용 감소 효과 증가</div><div class="tooltip-cost">140⭐</div><div class="tooltip-effect">✨ 비용 -10%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">🏹</div><div class="tooltip"><div class="tooltip-title">🏹 활</div><div class="tooltip-desc">원거리 공격으로 자동 클릭 증가</div><div class="tooltip-cost">140⭐</div><div class="tooltip-effect">✨ 자동클릭 +2회/초</div></div></div>
+    </div>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-label">티어 13 - 신수</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">🐉</div><div class="tooltip"><div class="tooltip-title">🐉 용</div><div class="tooltip-desc">용의 숨결로 모든 것에 불태웁니다</div><div class="tooltip-cost">160⭐</div><div class="tooltip-effect">✨ 전체 +25%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">🦄</div><div class="tooltip"><div class="tooltip-title">🦄 유니콘</div><div class="tooltip-desc">마법의 힘으로 행운 증가</div><div class="tooltip-cost">160⭐</div><div class="tooltip-effect">✨ 확률 +20%p</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">🦅</div><div class="tooltip"><div class="tooltip-title">🦅 독수리</div><div class="tooltip-desc">하늘의 눈으로 크리티컬 증가</div><div class="tooltip-cost">160⭐</div><div class="tooltip-effect">✨ 크리티컬 +10%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">🦁</div><div class="tooltip"><div class="tooltip-title">🦁 사자</div><div class="tooltip-desc">왕의 위엄으로 CPS 대폭 증가</div><div class="tooltip-cost">160⭐</div><div class="tooltip-effect">✨ CPS +50%</div></div></div>
+    </div>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-label">티어 14 - 행성</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">🌍</div><div class="tooltip"><div class="tooltip-title">🌍 지구</div><div class="tooltip-desc">지구의 힘으로 기본 CPS 증가</div><div class="tooltip-cost">180⭐</div><div class="tooltip-effect">✨ 기본 CPS +100</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">🌙</div><div class="tooltip"><div class="tooltip-title">🌙 달</div><div class="tooltip-desc">달의 인력으로 쿠키 끌어오기</div><div class="tooltip-cost">180⭐</div><div class="tooltip-effect">✨ 이자 +0.2%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">☀️</div><div class="tooltip"><div class="tooltip-title">☀️ 태양</div><div class="tooltip-desc">태양 에너지로 모든 것 강화</div><div class="tooltip-cost">180⭐</div><div class="tooltip-effect">✨ 전체 +30%</div></div></div>
+    </div>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-label">티어 15 - 은하</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">🌌</div><div class="tooltip"><div class="tooltip-title">🌌 우주</div><div class="tooltip-desc">무한한 우주의 힘을 얻습니다</div><div class="tooltip-cost">200⭐</div><div class="tooltip-effect">✨ 전체 +40%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">🌀</div><div class="tooltip"><div class="tooltip-title">🌀 블랙홀</div><div class="tooltip-desc">모든 쿠키를 빨아들입니다</div><div class="tooltip-cost">200⭐</div><div class="tooltip-effect">✨ CPS +100%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">💫</div><div class="tooltip"><div class="tooltip-title">💫 성운</div><div class="tooltip-desc">별이 탄생하며 쿠키 생성</div><div class="tooltip-cost">200⭐</div><div class="tooltip-effect">✨ CPS +80%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">✨</div><div class="tooltip"><div class="tooltip-title">✨ 초신성</div><div class="tooltip-desc">폭발적으로 쿠키 획득</div><div class="tooltip-cost">200⭐</div><div class="tooltip-effect">✨ 클릭 +100%</div></div></div>
+    </div>
+  </div>
+
+  <!-- 티어 16-20 -->
+  <div class="tier-section">
+    <div class="tier-label">티어 16 - 신의 힘</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">⚡</div><div class="tooltip"><div class="tooltip-title">⚡ 신의 번개</div><div class="tooltip-desc">제우스의 번개를 얻습니다</div><div class="tooltip-cost">250⭐</div><div class="tooltip-effect">✨ 크리티컬 100%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">🔥</div><div class="tooltip"><div class="tooltip-title">🔥 신의 불꽃</div><div class="tooltip-desc">프로메테우스의 불을 얻습니다</div><div class="tooltip-cost">250⭐</div><div class="tooltip-effect">✨ 버닝 최대 +200%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">❄️</div><div class="tooltip"><div class="tooltip-title">❄️ 신의 얼음</div><div class="tooltip-desc">시간을 얼려 더 많이 획득</div><div class="tooltip-cost">250⭐</div><div class="tooltip-effect">✨ 시간당 +100%</div></div></div>
+    </div>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-label">티어 17 - 전지전능</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">👁️</div><div class="tooltip"><div class="tooltip-title">👁️ 전지</div><div class="tooltip-desc">모든 것을 보아 확률 100%</div><div class="tooltip-cost">300⭐</div><div class="tooltip-effect">✨ 모든 확률 100%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">🧠</div><div class="tooltip"><div class="tooltip-title">🧠 전능</div><div class="tooltip-desc">모든 것을 할 수 있습니다</div><div class="tooltip-cost">300⭐</div><div class="tooltip-effect">✨ 전체 +50%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">💪</div><div class="tooltip"><div class="tooltip-title">💪 전력</div><div class="tooltip-desc">무한한 힘을 얻습니다</div><div class="tooltip-cost">300⭐</div><div class="tooltip-effect">✨ 클릭 +200%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">🏃</div><div class="tooltip"><div class="tooltip-title">🏃 신속</div><div class="tooltip-desc">시간을 초월합니다</div><div class="tooltip-cost">300⭐</div><div class="tooltip-effect">✨ CPS +200%</div></div></div>
+    </div>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-label">티어 18 - 신화</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">👼</div><div class="tooltip"><div class="tooltip-title">👼 천사</div><div class="tooltip-desc">천사의 축복으로 영구 보너스</div><div class="tooltip-cost">400⭐</div><div class="tooltip-effect">✨ 전체 +60%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">😈</div><div class="tooltip"><div class="tooltip-title">😈 악마</div><div class="tooltip-desc">악마와 계약하여 대가를 얻음</div><div class="tooltip-cost">400⭐</div><div class="tooltip-effect">✨ ⭐ 획득 +100%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">🧙</div><div class="tooltip"><div class="tooltip-title">🧙 마법사</div><div class="tooltip-desc">마법으로 모든 것 강화</div><div class="tooltip-cost">400⭐</div><div class="tooltip-effect">✨ 전체 +50%</div></div></div>
+    </div>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-label">티어 19 - 신왕</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">👑</div><div class="tooltip"><div class="tooltip-title">👑 신왕</div><div class="tooltip-desc">신들의 왕이 되십시오</div><div class="tooltip-cost">500⭐</div><div class="tooltip-effect">✨ 전체 +80%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">👸</div><div class="tooltip"><div class="tooltip-title">👸 신여왕</div><div class="tooltip-desc">모든 신의 어머니</div><div class="tooltip-cost">500⭐</div><div class="tooltip-effect">✨ CPS +150%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">🤴</div><div class="tooltip"><div class="tooltip-title">🤴 신왕자</div><div class="tooltip-desc">미래의 신왕</div><div class="tooltip-cost">500⭐</div><div class="tooltip-effect">✨ 클릭 +150%</div></div></div>
+      <div class="skill-node locked"><div class="skill-icon">👸</div><div class="tooltip"><div class="tooltip-title">👸 신공주</div><div class="tooltip-desc">축복의 근원</div><div class="tooltip-cost">500⭐</div><div class="tooltip-effect">✨ 이자 +1%</div></div></div>
+    </div>
+  </div>
+
+  <div class="tier-section">
+    <div class="tier-label">티어 20 - 초월</div>
+    <div class="tier-row">
+      <div class="skill-node locked"><div class="skill-icon">🏆</div>
+        <div class="tooltip">
+          <div class="tooltip-title">🏆 초월자</div>
+          <div class="tooltip-desc">신을 초월한 존재가 되어 모든 한계를 극복합니다. 이것이 끝이자 시작입니다!</div>
+          <div class="tooltip-cost">비용: 1000⭐</div>
+          <div class="tooltip-req">🔒 필요: 티어 19의 모든 스킬 해금</div>
+          <div class="tooltip-effect">✨ 모든 효과 +100%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr style="margin: 30px 0 25px 0; border: none; border-top: 1px solid #ddd;">
+
+<h3>상세 설명 추가 완료!</h3>
+<p style="text-align: center; color: #666; font-size: 11px;">마우스를 올려서 각 스킬의 효과를 확인하세요!</p>
+
+<div style="height: 20px;"></div>
+
+<div class="options">
+  <div class="option" data-choice="good" onclick="toggleSelect(this)">
+    <div class="letter">👍</div>
+    <div class="content">
+      <h3>완벽!</h3>
+      <p>이 디자인으로 진행</p>
+    </div>
+  </div>
+  <div class="option" data-choice="modify" onclick="toggleSelect(this)">
+    <div class="letter">🔧</div>
+    <div class="content">
+      <h3>수정 원함</h3>
+    </div>
+  </div>
+</div>

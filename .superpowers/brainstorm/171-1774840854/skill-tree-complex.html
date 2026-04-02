@@ -1,0 +1,245 @@
+<h2>🍪 프레스티지 스킬 트리 (복잡한 연결)</h2>
+<p class="subtitle">여러 노드를 해금해야 다음이 열립니다!</p>
+
+<style>
+  .skill-tree {
+    padding: 20px;
+    position: relative;
+  }
+  
+  .tree-row {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 50px;
+    position: relative;
+  }
+  
+  .skill-node {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    z-index: 2;
+    font-size: 10px;
+    text-align: center;
+  }
+  
+  .skill-node.root {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+  }
+  
+  .skill-node.available {
+    background: linear-gradient(135deg, #17a2b8, #20c997);
+    color: white;
+    box-shadow: 0 0 15px rgba(23, 162, 184, 0.4);
+  }
+  
+  .skill-node.locked {
+    background: #555;
+    color: #aaa;
+    opacity: 0.6;
+  }
+  
+  .skill-node.unlocked {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    box-shadow: 0 0 25px rgba(40, 167, 69, 0.6);
+  }
+  
+  .skill-node.selected {
+    outline: 4px solid gold;
+    outline-offset: 3px;
+  }
+  
+  .skill-node:hover {
+    transform: scale(1.1);
+  }
+  
+  .skill-icon { font-size: 24px; }
+  .skill-name { font-weight: bold; font-size: 9px; margin-top: 2px; }
+  .skill-cost { font-size: 8px; }
+  .skill-req { font-size: 7px; color: #ffa; margin-top: 2px; }
+  
+  .connection-box {
+    background: #f0f0f0;
+    border-radius: 15px;
+    padding: 15px;
+    margin: 0 auto;
+    max-width: 700px;
+    position: relative;
+  }
+  
+  .legend {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 12px;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .legend-dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+  }
+  
+  .req-text {
+    font-size: 10px;
+    color: #888;
+    text-align: center;
+    margin-top: 5px;
+  }
+  
+  .arrow {
+    font-size: 20px;
+    color: #666;
+    margin: 0 -5px;
+  }
+  
+  .combine-arrow {
+    text-align: center;
+    font-size: 16px;
+    color: #764ba2;
+    margin: 5px 0;
+  }
+</style>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background: linear-gradient(135deg, #667eea, #764ba2);"></div> 시작점</div>
+  <div class="legend-item"><div class="legend-dot" style="background: linear-gradient(135deg, #17a2b8, #20c997);"></div> 해금 가능</div>
+  <div class="legend-item"><div class="legend-dot" style="background: linear-gradient(135deg, #28a745, #20c997);"></div> 해금됨</div>
+  <div class="legend-item"><div class="legend-dot" style="background: #555;"></div> 잠김</div>
+</div>
+
+<div class="connection-box">
+  <!-- 1티어: 시작점 -->
+  <div class="tree-row">
+    <div class="skill-node root selected" onclick="toggleSelect(this)">
+      <div class="skill-icon">🏠</div>
+      <div class="skill-name">시작</div>
+      <div class="skill-cost">10⭐</div>
+    </div>
+  </div>
+  
+  <div class="combine-arrow">⬇️ ⬇️ ⬇️</div>
+  
+  <!-- 2티어: 3개 갈래 -->
+  <div class="tree-row">
+    <div class="skill-node available" onclick="toggleSelect(this)">
+      <div class="skill-icon">👆</div>
+      <div class="skill-name">클릭+10%</div>
+      <div class="skill-cost">15⭐</div>
+    </div>
+    <div class="skill-node available" onclick="toggleSelect(this)">
+      <div class="skill-icon">📈</div>
+      <div class="skill-name">CPS+10%</div>
+      <div class="skill-cost">15⭐</div>
+    </div>
+    <div class="skill-node available" onclick="toggleSelect(this)">
+      <div class="skill-icon">💰</div>
+      <div class="skill-name">비용-5%</div>
+      <div class="skill-cost">15⭐</div>
+    </div>
+  </div>
+  
+  <div class="req-text">클릭+10% + CPS+10% → ⬇️</div>
+  <div class="req-text">CPS+10% + 비용-5% → ⬇️</div>
+  <div class="req-text">클릭+10% + 비용-5% → ⬇️</div>
+  
+  <!-- 3티어: 조합 필요 -->
+  <div class="tree-row">
+    <div class="skill-node locked" onclick="toggleSelect(this)">
+      <div class="skill-icon">💥</div>
+      <div class="skill-name">크리티컬</div>
+      <div class="skill-cost">30⭐</div>
+      <div class="skill-req">클릭+CPS</div>
+    </div>
+    <div class="skill-node locked" onclick="toggleSelect(this)">
+      <div class="skill-icon">🌙</div>
+      <div class="skill-name">오프라인</div>
+      <div class="skill-cost">30⭐</div>
+      <div class="skill-req">CPS+비용</div>
+    </div>
+    <div class="skill-node locked" onclick="toggleSelect(this)">
+      <div class="skill-icon">🖱️</div>
+      <div class="skill-name">자동클릭</div>
+      <div class="skill-cost">30⭐</div>
+      <div class="skill-req">클릭+비용</div>
+    </div>
+  </div>
+  
+  <div class="req-text">크리티컬 + 오프라인 → ⬇️ ⬇️</div>
+  <div class="req-text">오프라인 + 자동클릭 → ⬇️ ⬇️</div>
+  
+  <!-- 4티어: 2개 조합 -->
+  <div class="tree-row">
+    <div class="skill-node locked" onclick="toggleSelect(this)">
+      <div class="skill-icon">⏱️</div>
+      <div class="skill-name">강화보너스</div>
+      <div class="skill-cost">50⭐</div>
+      <div class="skill-req">크리+오프라인</div>
+    </div>
+    <div class="skill-node locked" onclick="toggleSelect(this)">
+      <div class="skill-icon">🏦</div>
+      <div class="skill-name">이자</div>
+      <div class="skill-cost">50⭐</div>
+      <div class="skill-req">오프+자동</div>
+    </div>
+  </div>
+  
+  <div class="req-text">강화보너스 + 이자 → ⬇️</div>
+  
+  <!-- 5티어: 최종 -->
+  <div class="tree-row">
+    <div class="skill-node locked" onclick="toggleSelect(this)">
+      <div class="skill-icon">👑</div>
+      <div class="skill-name">마스터리</div>
+      <div class="skill-cost">100⭐</div>
+      <div class="skill-req">강화+이자</div>
+    </div>
+  </div>
+</div>
+
+<hr style="margin: 25px 0; border: none; border-top: 1px solid #ddd;">
+
+<h3>이런 구조 어때요?</h3>
+<p style="text-align: center; color: #666; font-size: 13px;">2개 이상 해금해야 다음 노드가 열리는 시스템!</p>
+
+<div class="options">
+  <div class="option" data-choice="good" onclick="toggleSelect(this)">
+    <div class="letter">👍</div>
+    <div class="content">
+      <h3>완벽!</h3>
+      <p>이 구조로 진행</p>
+    </div>
+  </div>
+  <div class="option" data-choice="more" onclick="toggleSelect(this)">
+    <div class="letter">🔥</div>
+    <div class="content">
+      <h3>더 복잡하게!</h3>
+      <p>선행조건 더 많이</p>
+    </div>
+  </div>
+  <div class="option" data-choice="modify" onclick="toggleSelect(this)">
+    <div class="letter">🔧</div>
+    <div class="content">
+      <h3>수정 원함</h3>
+      <p>변경사항 말씀해주세요</p>
+    </div>
+  </div>
+</div>

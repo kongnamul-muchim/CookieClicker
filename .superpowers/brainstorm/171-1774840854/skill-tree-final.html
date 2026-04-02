@@ -1,0 +1,427 @@
+<h2>🍪 프레스티지 스킬 트리 (스크롤 + 대량 스킬)</h2>
+<p class="subtitle">스크롤해서 전체 스킬 확인! (총 21개)</p>
+
+<style>
+  .popup-preview {
+    width: 450px;
+    height: 380px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border-radius: 15px;
+    margin: 0 auto;
+    padding: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  
+  .popup-preview::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .popup-preview::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+  }
+  
+  .popup-preview::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 3px;
+  }
+  
+  .popup-title {
+    color: #b8a9c9;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 8px;
+    position: sticky;
+    top: 0;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    padding: 5px 0;
+    z-index: 10;
+  }
+  
+  .stars-display {
+    text-align: center;
+    color: gold;
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+  
+  .tier-row {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    margin-bottom: 35px;
+    position: relative;
+  }
+  
+  .tier-row.tier-1 { gap: 0; }
+  .tier-row.tier-2 { gap: 100px; }
+  .tier-row.tier-3 { gap: 70px; }
+  .tier-row.tier-4 { gap: 60px; }
+  .tier-row.tier-5 { gap: 50px; }
+  .tier-row.tier-6 { gap: 40px; }
+  .tier-row.tier-7 { gap: 0; }
+  
+  .skill-node {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    z-index: 2;
+    font-size: 10px;
+    text-align: center;
+  }
+  
+  .skill-node.unlocked {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    box-shadow: 0 0 12px rgba(40, 167, 69, 0.5);
+  }
+  
+  .skill-node.available {
+    background: linear-gradient(135deg, #0066cc, #0099ff);
+    color: white;
+    box-shadow: 0 0 10px rgba(0, 102, 204, 0.4);
+  }
+  
+  .skill-node.locked {
+    background: rgba(80, 80, 80, 0.4);
+    color: rgba(255, 255, 255, 0.5);
+    border: 1px dashed rgba(150, 150, 150, 0.4);
+  }
+  
+  .skill-node.root {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 0 12px rgba(102, 126, 234, 0.5);
+  }
+  
+  .skill-node:hover {
+    transform: scale(1.15);
+    z-index: 100;
+  }
+  
+  .skill-icon { font-size: 18px; }
+  
+  .tooltip {
+    position: absolute;
+    top: 52px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(20, 20, 30, 0.98);
+    color: white;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    width: 150px;
+    text-align: left;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  
+  .tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-bottom-color: rgba(20, 20, 30, 0.98);
+  }
+  
+  .skill-node:hover .tooltip {
+    opacity: 1;
+  }
+  
+  .tooltip-title {
+    font-weight: bold;
+    font-size: 11px;
+    margin-bottom: 3px;
+    color: #7bed9f;
+  }
+  
+  .tooltip-desc { color: #bbb; font-size: 9px; margin-bottom: 3px; }
+  .tooltip-cost { color: gold; font-size: 9px; margin-bottom: 2px; }
+  .tooltip-req { color: #ff6b6b; font-size: 8px; }
+  .tooltip-effect { color: #70a1ff; font-size: 9px; padding-top: 3px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 3px; }
+  
+  .legend {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 12px;
+    font-size: 10px;
+    color: #aaa;
+  }
+  
+  .legend-item { display: flex; align-items: center; gap: 4px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  
+  .tier-label {
+    text-align: center;
+    color: #555;
+    font-size: 9px;
+    margin-bottom: 5px;
+  }
+</style>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background: linear-gradient(135deg, #28a745, #20c997);"></div> 해금</div>
+  <div class="legend-item"><div class="legend-dot" style="background: linear-gradient(135deg, #0066cc, #0099ff);"></div> 가능</div>
+  <div class="legend-item"><div class="legend-dot" style="background: rgba(80,80,80,0.4); border: 1px dashed #666;"></div> 잠김</div>
+</div>
+
+<div class="popup-preview">
+  <div class="popup-title">⭐ 프레스티지 스킬 트리 (21 스킬)</div>
+  <div class="stars-display">보유: 150⭐ | 해금: 1/21</div>
+  
+  <!-- 티어 1 -->
+  <div class="tier-label">티어 1</div>
+  <div class="tier-row tier-1">
+    <div class="skill-node root unlocked">
+      <div class="skill-icon">🏠</div>
+      <div class="tooltip">
+        <div class="tooltip-title">🏠 시작점</div>
+        <div class="tooltip-desc">프레스티지의 시작!</div>
+        <div class="tooltip-cost">비용: 10⭐</div>
+        <div class="tooltip-effect">✅ 자동 해금</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 티어 2 -->
+  <div class="tier-label">티어 2 (3개 중 선택)</div>
+  <div class="tier-row tier-2">
+    <div class="skill-node available">
+      <div class="skill-icon">👆</div>
+      <div class="tooltip">
+        <div class="tooltip-title">👆 클릭 강화</div>
+        <div class="tooltip-desc">클릭 데미지 영구 증가</div>
+        <div class="tooltip-cost">비용: 15⭐</div>
+        <div class="tooltip-effect">✨ 클릭 +10%</div>
+      </div>
+    </div>
+    <div class="skill-node available">
+      <div class="skill-icon">📈</div>
+      <div class="tooltip">
+        <div class="tooltip-title">📈 CPS 강화</div>
+        <div class="tooltip-desc">자동 생산력 증가</div>
+        <div class="tooltip-cost">비용: 15⭐</div>
+        <div class="tooltip-effect">✨ CPS +10%</div>
+      </div>
+    </div>
+    <div class="skill-node available">
+      <div class="skill-icon">💰</div>
+      <div class="tooltip">
+        <div class="tooltip-title">💰 할인</div>
+        <div class="tooltip-desc">모든 업그레이드 할인</div>
+        <div class="tooltip-cost">비용: 15⭐</div>
+        <div class="tooltip-effect">✨ 비용 -5%</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 티어 3 -->
+  <div class="tier-label">티어 3 (선행조건 2개)</div>
+  <div class="tier-row tier-3">
+    <div class="skill-node locked">
+      <div class="skill-icon">💥</div>
+      <div class="tooltip">
+        <div class="tooltip-title">💥 크리티컬</div>
+        <div class="tooltip-desc">클릭 크리티컬 확률</div>
+        <div class="tooltip-cost">비용: 25⭐</div>
+        <div class="tooltip-req">🔒 클릭+CPS</div>
+        <div class="tooltip-effect">✨ 5% 확률 3배</div>
+      </div>
+    </div>
+    <div class="skill-node locked">
+      <div class="skill-icon">🏦</div>
+      <div class="tooltip">
+        <div class="tooltip-title">🏦 이자</div>
+        <div class="tooltip-desc">매초 보유 쿠키 % 획득</div>
+        <div class="tooltip-cost">비용: 25⭐</div>
+        <div class="tooltip-req">🔒 CPS+할인</div>
+        <div class="tooltip-effect">✨ +0.1%/초</div>
+      </div>
+    </div>
+    <div class="skill-node locked">
+      <div class="skill-icon">🖱️</div>
+      <div class="tooltip">
+        <div class="tooltip-title">🖱️ 자동클릭</div>
+        <div class="tooltip-desc">자동으로 클릭</div>
+        <div class="tooltip-cost">비용: 25⭐</div>
+        <div class="tooltip-req">🔒 클릭+할인</div>
+        <div class="tooltip-effect">✨ 1회/초</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 티어 4 -->
+  <div class="tier-label">티어 4 (선행조건 2개)</div>
+  <div class="tier-row tier-4">
+    <div class="skill-node locked">
+      <div class="skill-icon">🍀</div>
+      <div class="tooltip">
+        <div class="tooltip-title">🍀 행운</div>
+        <div class="tooltip-desc">행운 확률 증가</div>
+        <div class="tooltip-cost">비용: 30⭐</div>
+        <div class="tooltip-req">🔒 크리+이자</div>
+        <div class="tooltip-effect">✨ 행운 +10%</div>
+      </div>
+    </div>
+    <div class="skill-node locked">
+      <div class="skill-icon">⏱️</div>
+      <div class="tooltip">
+        <div class="tooltip-title">⏱️ 강화보너스</div>
+        <div class="tooltip-desc">강화 효과 증가</div>
+        <div class="tooltip-cost">비용: 30⭐</div>
+        <div class="tooltip-req">🔒 크리+자동</div>
+        <div class="tooltip-effect">✨ 강화 +30%</div>
+      </div>
+    </div>
+    <div class="skill-node locked">
+      <div class="skill-icon">🎁</div>
+      <div class="tooltip">
+        <div class="tooltip-title">🎁 시작보너스</div>
+        <div class="tooltip-desc">리셋 후 시작 쿠키</div>
+        <div class="tooltip-cost">비용: 30⭐</div>
+        <div class="tooltip-req">🔒 이자+자동</div>
+        <div class="tooltip-effect">✨ 시작 1,000</div>
+      </div>
+    </div>
+    <div class="skill-node locked">
+      <div class="skill-icon">💎</div>
+      <div class="tooltip">
+        <div class="tooltip-title">💎 특수강화</div>
+        <div class="tooltip-desc">특별 강화 비용 감소</div>
+        <div class="tooltip-cost">비용: 30⭐</div>
+        <div class="tooltip-req">🔒 이자+크리</div>
+        <div class="tooltip-effect">✨ 특강 -20%</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 티어 5 -->
+  <div class="tier-label">티어 5 (선행조건 3개)</div>
+  <div class="tier-row tier-5">
+    <div class="skill-node locked">
+      <div class="skill-icon">🔥</div>
+      <div class="tooltip">
+        <div class="tooltip-title">🔥 버닝</div>
+        <div class="tooltip-desc">연속 클릭 보너스</div>
+        <div class="tooltip-cost">비용: 50⭐</div>
+        <div class="tooltip-req">🔒 행운+강화+시작</div>
+        <div class="tooltip-effect">✨ 연속 +5%/초</div>
+      </div>
+    </div>
+    <div class="skill-node locked">
+      <div class="skill-icon">⚡</div>
+      <div class="tooltip">
+        <div class="tooltip-title">⚡ 번개</div>
+        <div class="tooltip-desc">간헐적 대폭 보너스</div>
+        <div class="tooltip-cost">비용: 50⭐</div>
+        <div class="tooltip-req">🔒 행운+특수+시작</div>
+        <div class="tooltip-effect">✨ 1% 확률 10배</div>
+      </div>
+    </div>
+    <div class="skill-node locked">
+      <div class="skill-icon">🌟</div>
+      <div class="tooltip">
+        <div class="tooltip-title">🌟 스타</div>
+        <div class="tooltip-desc">모든 효과 증가</div>
+        <div class="tooltip-cost">비용: 50⭐</div>
+        <div class="tooltip-req">🔒 강화+특수+시작</div>
+        <div class="tooltip-effect">✨ 전체 +10%</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 티어 6 -->
+  <div class="tier-label">티어 6 (선행조건 2개)</div>
+  <div class="tier-row tier-6">
+    <div class="skill-node locked">
+      <div class="skill-icon">🌀</div>
+      <div class="tooltip">
+        <div class="tooltip-title">🌀 리셋보너스</div>
+        <div class="tooltip-desc">프레스티지 보너스 증가</div>
+        <div class="tooltip-cost">비용: 75⭐</div>
+        <div class="tooltip-req">🔒 버닝+번개</div>
+        <div class="tooltip-effect">✨ ⭐ 획득 +50%</div>
+      </div>
+    </div>
+    <div class="skill-node locked">
+      <div class="skill-icon">💫</div>
+      <div class="tooltip">
+        <div class="tooltip-title">💫 더블</div>
+        <div class="tooltip-desc">효과 2배 기회</div>
+        <div class="tooltip-cost">비용: 75⭐</div>
+        <div class="tooltip-req">🔒 번개+스타</div>
+        <div class="tooltip-effect">✨ 3% 확률 2배</div>
+      </div>
+    </div>
+    <div class="skill-node locked">
+      <div class="skill-icon">🎪</div>
+      <div class="tooltip">
+        <div class="tooltip-title">🎪 카니발</div>
+        <div class="tooltip-desc">랜덤 보너스</div>
+        <div class="tooltip-cost">비용: 75⭐</div>
+        <div class="tooltip-req">🔒 버닝+스타</div>
+        <div class="tooltip-effect">✨ 랜덤 1~5배</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 티어 7 -->
+  <div class="tier-label">티어 7 (최종)</div>
+  <div class="tier-row tier-7">
+    <div class="skill-node locked">
+      <div class="skill-icon">👑</div>
+      <div class="tooltip">
+        <div class="tooltip-title">👑 마스터리</div>
+        <div class="tooltip-desc">전체 대폭 증가!</div>
+        <div class="tooltip-cost">비용: 150⭐</div>
+        <div class="tooltip-req">🔒 6티어 전부</div>
+        <div class="tooltip-effect">✨ 전체 +50%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr style="margin: 30px 0 25px 0; border: none; border-top: 1px solid #ddd;">
+
+<h3>스크롤 + 21개 스킬!</h3>
+
+<div style="height: 20px;"></div>
+
+<div class="options">
+  <div class="option" data-choice="good" onclick="toggleSelect(this)">
+    <div class="letter">👍</div>
+    <div class="content">
+      <h3>완벽!</h3>
+      <p>이 디자인으로 진행</p>
+    </div>
+  </div>
+  <div class="option" data-choice="add" onclick="toggleSelect(this)">
+    <div class="letter">➕</div>
+    <div class="content">
+      <h3>더 추가!</h3>
+      <p>스킬 더 늘리기</p>
+    </div>
+  </div>
+  <div class="option" data-choice="modify" onclick="toggleSelect(this)">
+    <div class="letter">🔧</div>
+    <div class="content">
+      <h3>수정 원함</h3>
+    </div>
+  </div>
+</div>

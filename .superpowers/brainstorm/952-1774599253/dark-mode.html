@@ -1,0 +1,223 @@
+<h2>다크모드</h2>
+<p class="subtitle">어떤 스타일이 좋으세요?</p>
+
+<style>
+  .preview-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .preview-box {
+    width: 280px;
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .preview-box:hover {
+    transform: translateY(-5px);
+  }
+  
+  /* 현재 라이트 모드 */
+  .light-preview {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+  }
+  .light-card {
+    background: white;
+    border-radius: 15px;
+    padding: 15px;
+  }
+  .light-title { color: #764ba2; font-size: 18px; font-weight: bold; text-align: center; margin-bottom: 10px; }
+  .light-cookie {
+    width: 60px; height: 60px;
+    background: linear-gradient(145deg, #f5e6d3, #d4a574);
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px;
+  }
+  .light-stats { background: #f8f9fa; border-radius: 10px; padding: 10px; text-align: center; }
+  .light-stat { color: #333; font-size: 12px; }
+  .light-stat span { color: #764ba2; font-weight: bold; }
+  
+  /* 다크모드 A - 퍼플 */
+  .dark-a-preview {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+  }
+  .dark-a-card {
+    background: #1f1f3a;
+    border-radius: 15px;
+    padding: 15px;
+    border: 1px solid #2d2d5a;
+  }
+  .dark-a-title { color: #a78bfa; font-size: 18px; font-weight: bold; text-align: center; margin-bottom: 10px; }
+  .dark-a-cookie {
+    width: 60px; height: 60px;
+    background: linear-gradient(145deg, #3d3d6b, #2d2d5a);
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px;
+    box-shadow: 0 0 15px rgba(167, 139, 250, 0.3);
+  }
+  .dark-a-stats { background: #2a2a4a; border-radius: 10px; padding: 10px; text-align: center; }
+  .dark-a-stat { color: #e0e0e0; font-size: 12px; }
+  .dark-a-stat span { color: #a78bfa; font-weight: bold; }
+  
+  /* 다크모드 B - 블루 */
+  .dark-b-preview {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 100%);
+    box-shadow: 0 5px 20px rgba(59, 130, 246, 0.2);
+  }
+  .dark-b-card {
+    background: #1e1e3f;
+    border-radius: 15px;
+    padding: 15px;
+    border: 1px solid #2e2e5f;
+  }
+  .dark-b-title { color: #60a5fa; font-size: 18px; font-weight: bold; text-align: center; margin-bottom: 10px; }
+  .dark-b-cookie {
+    width: 60px; height: 60px;
+    background: linear-gradient(145deg, #2e2e5f, #1e1e3f);
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px;
+    box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+  }
+  .dark-b-stats { background: #252545; border-radius: 10px; padding: 10px; text-align: center; }
+  .dark-b-stat { color: #e0e0e0; font-size: 12px; }
+  .dark-b-stat span { color: #60a5fa; font-weight: bold; }
+  
+  /* 다크모드 C - 다크 그레이 */
+  .dark-c-preview {
+    background: linear-gradient(135deg, #1f1f1f 0%, #2d2d2d 100%);
+    box-shadow: 0 5px 20px rgba(255, 255, 255, 0.1);
+  }
+  .dark-c-card {
+    background: #2a2a2a;
+    border-radius: 15px;
+    padding: 15px;
+    border: 1px solid #3a3a3a;
+  }
+  .dark-c-title { color: #ffd93d; font-size: 18px; font-weight: bold; text-align: center; margin-bottom: 10px; }
+  .dark-c-cookie {
+    width: 60px; height: 60px;
+    background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px;
+    box-shadow: 0 0 15px rgba(255, 217, 61, 0.2);
+  }
+  .dark-c-stats { background: #333; border-radius: 10px; padding: 10px; text-align: center; }
+  .dark-c-stat { color: #e0e0e0; font-size: 12px; }
+  .dark-c-stat span { color: #ffd93d; font-weight: bold; }
+  
+  .theme-label {
+    text-align: center;
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 14px;
+  }
+  .light-preview .theme-label { color: white; }
+  .dark-a-preview .theme-label { color: #a78bfa; }
+  .dark-b-preview .theme-label { color: #60a5fa; }
+  .dark-c-preview .theme-label { color: #ffd93d; }
+</style>
+
+<div class="preview-container">
+  <div class="preview-box light-preview" onclick="toggleSelect(this)">
+    <div class="light-card">
+      <div class="light-title">쿠키 클리커</div>
+      <div class="light-cookie">🍪</div>
+      <div class="light-stats">
+        <p class="light-stat">쿠키: <span>1,000</span>개</p>
+        <p class="light-stat">초당: <span>10</span>개</p>
+      </div>
+    </div>
+    <p class="theme-label">현재 (라이트)</p>
+  </div>
+  
+  <div class="preview-box dark-a-preview" onclick="toggleSelect(this)">
+    <div class="dark-a-card">
+      <div class="dark-a-title">쿠키 클리커</div>
+      <div class="dark-a-cookie">🍪</div>
+      <div class="dark-a-stats">
+        <p class="dark-a-stat">쿠키: <span>1,000</span>개</p>
+        <p class="dark-a-stat">초당: <span>10</span>개</p>
+      </div>
+    </div>
+    <p class="theme-label">A. 퍼플 다크</p>
+  </div>
+  
+  <div class="preview-box dark-b-preview" onclick="toggleSelect(this)">
+    <div class="dark-b-card">
+      <div class="dark-b-title">쿠키 클리커</div>
+      <div class="dark-b-cookie">🍪</div>
+      <div class="dark-b-stats">
+        <p class="dark-b-stat">쿠키: <span>1,000</span>개</p>
+        <p class="dark-b-stat">초당: <span>10</span>개</p>
+      </div>
+    </div>
+    <p class="theme-label">B. 블루 다크</p>
+  </div>
+  
+  <div class="preview-box dark-c-preview" onclick="toggleSelect(this)">
+    <div class="dark-c-card">
+      <div class="dark-c-title">쿠키 클리커</div>
+      <div class="dark-c-cookie">🍪</div>
+      <div class="dark-c-stats">
+        <p class="dark-c-stat">쿠키: <span>1,000</span>개</p>
+        <p class="dark-c-stat">초당: <span>10</span>개</p>
+      </div>
+    </div>
+    <p class="theme-label">C. 골드 다크</p>
+  </div>
+</div>
+
+<hr style="margin: 25px 0; border: none; border-top: 1px solid #ddd;">
+
+<h3>어떤 테마를 원하시나요?</h3>
+<div class="options" data-multiselect>
+  <div class="option" data-choice="light" onclick="toggleSelect(this)">
+    <div class="letter">☀️</div>
+    <div class="content">
+      <h3>라이트만</h3>
+      <p>현재 유지</p>
+    </div>
+  </div>
+  <div class="option" data-choice="purple" onclick="toggleSelect(this)">
+    <div class="letter">💜</div>
+    <div class="content">
+      <h3>퍼플 다크</h3>
+      <p>보라빛 다크모드</p>
+    </div>
+  </div>
+  <div class="option" data-choice="blue" onclick="toggleSelect(this)">
+    <div class="letter">💙</div>
+    <div class="content">
+      <h3>블루 다크</h3>
+      <p>파란빛 다크모드</p>
+    </div>
+  </div>
+  <div class="option" data-choice="gold" onclick="toggleSelect(this)">
+    <div class="letter">💛</div>
+    <div class="content">
+      <h3>골드 다크</h3>
+      <p>금색 포인트 다크모드</p>
+    </div>
+  </div>
+  <div class="option" data-choice="toggle" onclick="toggleSelect(this)">
+    <div class="letter">🔄</div>
+    <div class="content">
+      <h3>토글 버튼</h3>
+      <p>라이트/다크 전환 기능 추가</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,256 @@
+<h2>사운드 효과</h2>
+<p class="subtitle">어떤 소리를 추가할까요?</p>
+
+<style>
+  .demo-area {
+    padding: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .sound-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .sound-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+  
+  .sound-info {
+    flex: 1;
+  }
+  
+  .sound-name {
+    font-weight: bold;
+    font-size: 15px;
+    color: #333;
+  }
+  
+  .sound-desc {
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+  }
+  
+  .sound-toggle {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .toggle-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    background: #e0e0e0;
+    color: #666;
+    transition: all 0.2s;
+  }
+  
+  .toggle-btn.active {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+  }
+  
+  .volume-slider {
+    margin-top: 8px;
+  }
+  
+  .volume-slider input {
+    width: 100%;
+  }
+  
+  .settings-box {
+    background: linear-gradient(135deg, #f0f0f0, #e8e8e8);
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 20px;
+  }
+  
+  .setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .setting-row:last-child {
+    border-bottom: none;
+  }
+  
+  .setting-label {
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .setting-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .switch {
+    width: 50px;
+    height: 26px;
+    background: #ccc;
+    border-radius: 13px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .switch.on {
+    background: #28a745;
+  }
+  
+  .switch::after {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: left 0.3s;
+  }
+  
+  .switch.on::after {
+    left: 26px;
+  }
+  
+  .note {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 10px 15px;
+    margin-top: 15px;
+    border-radius: 0 8px 8px 0;
+    font-size: 13px;
+    color: #856404;
+  }
+</style>
+
+<div class="demo-area">
+  <div class="sound-card">
+    <div class="sound-icon">🍪</div>
+    <div class="sound-info">
+      <p class="sound-name">쿠키 클릭음</p>
+      <p class="sound-desc">클릭할 때마다 "딸깍" 소리</p>
+    </div>
+    <div class="sound-toggle">
+      <button class="toggle-btn active">ON</button>
+      <button class="toggle-btn">OFF</button>
+    </div>
+  </div>
+  
+  <div class="sound-card">
+    <div class="sound-icon">⬆️</div>
+    <div class="sound-info">
+      <p class="sound-name">레벨업 효과음</p>
+      <p class="sound-desc">업그레이드 구매 시 "띠링!"</p>
+    </div>
+    <div class="sound-toggle">
+      <button class="toggle-btn active">ON</button>
+      <button class="toggle-btn">OFF</button>
+    </div>
+  </div>
+  
+  <div class="sound-card">
+    <div class="sound-icon">💥</div>
+    <div class="sound-info">
+      <p class="sound-name">크리티컬 효과음</p>
+      <p class="sound-desc">크리티컬 발동 시 강조음</p>
+    </div>
+    <div class="sound-toggle">
+      <button class="toggle-btn active">ON</button>
+      <button class="toggle-btn">OFF</button>
+    </div>
+  </div>
+  
+  <div class="sound-card">
+    <div class="sound-icon">🎵</div>
+    <div class="sound-info">
+      <p class="sound-name">배경음악</p>
+      <p class="sound-desc">편안한 BGM (루프)</p>
+    </div>
+    <div class="sound-toggle">
+      <button class="toggle-btn">ON</button>
+      <button class="toggle-btn active">OFF</button>
+    </div>
+  </div>
+  
+  <div class="settings-box">
+    <div class="setting-row">
+      <span class="setting-label">전체 사운드</span>
+      <div class="switch on" onclick="this.classList.toggle('on')"></div>
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">마스터 볼륨</span>
+      <div class="setting-control">
+        <span style="font-size: 12px;">🔈</span>
+        <input type="range" min="0" max="100" value="70" style="width: 100px;">
+        <span style="font-size: 12px;">🔊</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="note">
+    💡 사운드는 브라우저 내장 Web Audio API 사용 - 외부 파일 불필요!
+  </div>
+</div>
+
+<hr style="margin: 25px 0; border: none; border-top: 1px solid #ddd;">
+
+<h3>사운드 추가할까요?</h3>
+<div class="options" data-multiselect>
+  <div class="option" data-choice="click" onclick="toggleSelect(this)">
+    <div class="letter">🍪</div>
+    <div class="content">
+      <h3>쿠키 클릭음</h3>
+      <p>딸깍 소리</p>
+    </div>
+  </div>
+  <div class="option" data-choice="levelup" onclick="toggleSelect(this)">
+    <div class="letter">⬆️</div>
+    <div class="content">
+      <h3>레벨업 효과음</h3>
+      <p>띠링!</p>
+    </div>
+  </div>
+  <div class="option" data-choice="critical" onclick="toggleSelect(this)">
+    <div class="letter">💥</div>
+    <div class="content">
+      <h3>크리티컬 효과음</h3>
+      <p>강조음</p>
+    </div>
+  </div>
+  <div class="option" data-choice="bgm" onclick="toggleSelect(this)">
+    <div class="letter">🎵</div>
+    <div class="content">
+      <h3>배경음악</h3>
+      <p>편안한 BGM</p>
+    </div>
+  </div>
+  <div class="option" data-choice="none" onclick="toggleSelect(this)">
+    <div class="letter">🔇</div>
+    <div class="content">
+      <h3>사운드 없이</h3>
+      <p>조용하게 플레이</p>
+    </div>
+  </div>
+</div>

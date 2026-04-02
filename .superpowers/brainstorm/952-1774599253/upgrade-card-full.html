@@ -1,0 +1,269 @@
+<h2>업그레이드 카드 - 전체 적용 미리보기</h2>
+<p class="subtitle">아이콘 + 빛나는 테두리 + 호버 + 레벨업 효과</p>
+
+<style>
+  .demo-area {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .upgrade-card {
+    background: linear-gradient(135deg, #fff 0%, #fafafa 100%);
+    border-radius: 12px;
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 2px solid transparent;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .upgrade-card.can-buy {
+    border-color: #28a745;
+    box-shadow: 0 0 15px rgba(40,167,69,0.3);
+  }
+  
+  .upgrade-card.can-buy::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(40,167,69,0.1), transparent);
+    animation: shimmer 2s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  
+  .upgrade-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+  }
+  
+  .upgrade-card.just-bought {
+    animation: levelUp 0.5s ease;
+  }
+  
+  @keyframes levelUp {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.05); box-shadow: 0 0 30px rgba(40,167,69,0.6); }
+    100% { transform: scale(1); }
+  }
+  
+  .upgrade-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .upgrade-icon {
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  
+  .upgrade-text { }
+  .upgrade-name { font-weight: bold; font-size: 15px; color: #333; }
+  .upgrade-level { color: #764ba2; font-size: 12px; font-weight: 500; }
+  .upgrade-details { color: #777; font-size: 11px; margin-top: 2px; }
+  
+  .upgrade-btn {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 13px;
+    box-shadow: 0 3px 8px rgba(40,167,69,0.3);
+    transition: all 0.2s;
+    position: relative;
+    z-index: 1;
+  }
+  .upgrade-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(40,167,69,0.4);
+  }
+  .upgrade-btn:disabled {
+    background: #ccc;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  
+  .upgrade-btn.enhance {
+    background: linear-gradient(135deg, #6f42c1, #9b59b6);
+  }
+  
+  .btn-group { display: flex; gap: 5px; position: relative; z-index: 1; }
+  .btn-group .upgrade-btn { padding: 8px 12px; }
+  
+  .max-badge {
+    background: linear-gradient(135deg, #ffc107, #ffdb4d);
+    color: #333;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 12px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .special-badge {
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+    color: #333;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 12px;
+    animation: pulse 1s infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 5px rgba(255,107,107,0.5); }
+    50% { box-shadow: 0 0 15px rgba(255,107,107,0.8); }
+  }
+  
+  .particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: gold;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10;
+  }
+</style>
+
+<div class="demo-area">
+  <div class="upgrade-card can-buy" id="card1">
+    <div class="upgrade-info">
+      <div class="upgrade-icon">👆</div>
+      <div class="upgrade-text">
+        <div class="upgrade-name">커서</div>
+        <div class="upgrade-level">Lv.5 → Lv.6</div>
+        <div class="upgrade-details">초당 +0.1 쿠키 • 비용: 100개</div>
+      </div>
+    </div>
+    <div class="btn-group">
+      <button class="upgrade-btn" onclick="buyUpgrade('card1')">+1</button>
+      <button class="upgrade-btn" style="background: linear-gradient(135deg, #17a2b8, #20c997);" onclick="buyUpgrade('card1')">+10</button>
+    </div>
+  </div>
+  
+  <div class="upgrade-card" id="card2">
+    <div class="upgrade-info">
+      <div class="upgrade-icon">👵</div>
+      <div class="upgrade-text">
+        <div class="upgrade-name">할머니</div>
+        <div class="upgrade-level">Lv.12</div>
+        <div class="upgrade-details">초당 +1 쿠키 • 비용: 1,200개</div>
+      </div>
+    </div>
+    <div class="btn-group">
+      <button class="upgrade-btn" disabled>+1</button>
+      <button class="upgrade-btn" style="background: linear-gradient(135deg, #17a2b8, #20c997);" disabled>+10</button>
+    </div>
+  </div>
+  
+  <div class="upgrade-card can-buy" id="card3">
+    <div class="upgrade-info">
+      <div class="upgrade-icon">🖱️</div>
+      <div class="upgrade-text">
+        <div class="upgrade-name">클릭 강화</div>
+        <div class="upgrade-level">Lv.100 만렙!</div>
+        <div class="upgrade-details">강화 비용: 50,000개</div>
+      </div>
+    </div>
+    <button class="upgrade-btn enhance" onclick="buyUpgrade('card3')">강화</button>
+  </div>
+  
+  <div class="upgrade-card can-buy" id="card4">
+    <div class="upgrade-info">
+      <div class="upgrade-icon">🚜</div>
+      <div class="upgrade-text">
+        <div class="upgrade-name">농장</div>
+        <div class="upgrade-level">Lv.100 만렙! ⭐</div>
+        <div class="upgrade-details">특별 강화: 클릭강화 2배</div>
+      </div>
+    </div>
+    <button class="special-badge" onclick="buyUpgrade('card4')">특별 강화</button>
+  </div>
+  
+  <div class="upgrade-card" id="card5">
+    <div class="upgrade-info">
+      <div class="upgrade-icon">🏭</div>
+      <div class="upgrade-text">
+        <div class="upgrade-name">공장</div>
+        <div class="upgrade-level">Lv.100 만렙!</div>
+        <div class="upgrade-details">모든 기능 완료</div>
+      </div>
+    </div>
+    <span class="max-badge">만렙</span>
+  </div>
+</div>
+
+<script>
+  function buyUpgrade(cardId) {
+    const card = document.getElementById(cardId);
+    card.classList.add('just-bought');
+    
+    // 레벨업 파티클
+    const rect = card.getBoundingClientRect();
+    for (let i = 0; i < 8; i++) {
+      setTimeout(() => {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = (rect.left + Math.random() * rect.width) + 'px';
+        p.style.top = rect.top + 'px';
+        document.body.appendChild(p);
+        
+        p.animate([
+          { transform: 'translateY(0) scale(1)', opacity: 1 },
+          { transform: `translateY(-30px) scale(0)`, opacity: 0 }
+        ], { duration: 400, easing: 'ease-out', fill: 'forwards' });
+        
+        setTimeout(() => p.remove(), 400);
+      }, i * 30);
+    }
+    
+    setTimeout(() => card.classList.remove('just-bought'), 500);
+  }
+</script>
+
+<hr style="margin: 25px 0; border: none; border-top: 1px solid #ddd;">
+
+<h3>마음에 드시나요?</h3>
+<div class="options">
+  <div class="option" data-choice="perfect" onclick="toggleSelect(this)">
+    <div class="letter">👍</div>
+    <div class="content">
+      <h3>완벽!</h3>
+      <p>이걸로 적용할게요</p>
+    </div>
+  </div>
+  <div class="option" data-choice="tweak" onclick="toggleSelect(this)">
+    <div class="letter">🔧</div>
+    <div class="content">
+      <h3>수정 원함</h3>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,204 @@
+<h2>진행바 & 달성률</h2>
+<p class="subtitle">다음 목표까지 얼마나 남았는지 시각적으로!</p>
+
+<style>
+  .demo-area {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .progress-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 15px;
+  }
+  
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  
+  .progress-title {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .progress-value {
+    font-size: 12px;
+    color: #666;
+  }
+  
+  .progress-bar {
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+  
+  .fill-green { background: linear-gradient(90deg, #28a745, #20c997); }
+  .fill-purple { background: linear-gradient(90deg, #764ba2, #a78bfa); }
+  .fill-gold { background: linear-gradient(90deg, #ffc107, #ffdb4d); }
+  
+  /* 애니메이션 진행바 */
+  .progress-fill.animated {
+    background-size: 200% 100%;
+    animation: progressShine 2s infinite;
+  }
+  
+  @keyframes progressShine {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  
+  /* 다음 마일스톤까지 */
+  .milestone-bar {
+    background: linear-gradient(90deg, #667eea, #764ba2);
+  }
+  
+  .milestone-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 11px;
+    color: #888;
+  }
+  
+  /* 만렙 달성 */
+  .max-achieved {
+    text-align: center;
+    padding: 15px;
+    background: linear-gradient(135deg, #fff9e6, #fff3cd);
+    border-radius: 12px;
+    border: 2px solid #ffc107;
+  }
+  
+  .max-achieved-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #856404;
+  }
+  
+  .max-achieved-sub {
+    font-size: 12px;
+    color: #a07800;
+    margin-top: 4px;
+  }
+  
+  /* 섹션 라벨 */
+  .section-label {
+    font-size: 13px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+</style>
+
+<div class="demo-area">
+  <div>
+    <p class="section-label">📊 다음 업그레이드까지</p>
+    <div class="progress-card">
+      <div class="progress-header">
+        <span class="progress-title">커서 구매</span>
+        <span class="progress-value">850 / 1,000 (85%)</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill fill-green animated" style="width: 85%; background: linear-gradient(90deg, #28a745, #20c997, #28a745);"></div>
+      </div>
+      <div class="milestone-info">
+        <span>현재: 850개</span>
+        <span>부족: 150개</span>
+      </div>
+    </div>
+  </div>
+  
+  <div>
+    <p class="section-label">🎯 레벨 진행</p>
+    <div class="progress-card">
+      <div class="progress-header">
+        <span class="progress-title">할머니 Lv.25</span>
+        <span class="progress-value">25 / 100 (25%)</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill fill-purple" style="width: 25%;"></div>
+      </div>
+      <div class="milestone-info">
+        <span>다음 강화: Lv.30</span>
+        <span>만렙까지: 75레벨</span>
+      </div>
+    </div>
+  </div>
+  
+  <div>
+    <p class="section-label">⭐ 특별 강화까지</p>
+    <div class="progress-card">
+      <div class="progress-header">
+        <span class="progress-title">농장 만렙 도전</span>
+        <span class="progress-value">92 / 100 (92%)</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill fill-gold animated" style="width: 92%; background: linear-gradient(90deg, #ffc107, #ffdb4d, #ffc107);"></div>
+      </div>
+      <div class="milestone-info">
+        <span>거의 다왔어요!</span>
+        <span>8레벨 남음</span>
+      </div>
+    </div>
+  </div>
+  
+  <div>
+    <p class="section-label">🎉 만렙 달성!</p>
+    <div class="max-achieved">
+      <p class="max-achieved-text">🎊 클릭 강화 만렙 달성! 🎊</p>
+      <p class="max-achieved-sub">강화 가능 • 특별 효과: 크리티컬 5%</p>
+    </div>
+  </div>
+</div>
+
+<hr style="margin: 25px 0; border: none; border-top: 1px solid #ddd;">
+
+<h3>어떤 진행바를 추가할까요?</h3>
+<div class="options" data-multiselect>
+  <div class="option" data-choice="upgrade" onclick="toggleSelect(this)">
+    <div class="letter">💰</div>
+    <div class="content">
+      <h3>업그레이드 구매 진행바</h3>
+      <p>각 카드에 다음 구매까지 진행률</p>
+    </div>
+  </div>
+  <div class="option" data-choice="level" onclick="toggleSelect(this)">
+    <div class="letter">📈</div>
+    <div class="content">
+      <h3>레벨 진행바</h3>
+      <p>만렙까지 얼마나 남았는지</p>
+    </div>
+  </div>
+  <div class="option" data-choice="milestone" onclick="toggleSelect(this)">
+    <div class="letter">🎯</div>
+    <div class="content">
+      <h3>마일스톤 알림</h3>
+      <p>강화/특별강화 가능 시 알림</p>
+    </div>
+  </div>
+  <div class="option" data-choice="celebrate" onclick="toggleSelect(this)">
+    <div class="letter">🎊</div>
+    <div class="content">
+      <h3>달성 축하 애니메이션</h3>
+      <p>만렙/강화 시 파티클 축하</p>
+    </div>
+  </div>
+</div>
