@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Player {
+  id                     Int      @id @default(autoincrement())
+  sessionId              String   @unique
+  cookies                Int      @default(0)
+  cookiesPerClick        Int      @default(1)
+  cookiesPerSecond       Float    @default(0)
+  prestigeCount          Int      @default(0)
+  prestigeStars          Int      @default(0)
+  totalClicks            Int      @default(0)
+  totalCookiesEarned     Float    @default(0)
+  totalUpgradesBought    Int      @default(0)
+  totalEnhancements      Int      @default(0)
+  totalTranscends        Int      @default(0)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  upgrades               Upgrade[]
+  unlockedSkills         UnlockedSkill[]
+  achievements           Achievement[]
+
+  @@index([sessionId])
+}
+
+model Upgrade {
+  id                   Int      @id @default(autoincrement())
+  playerId             Int
+  player               Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  upgradeType          String
+  level                Int      @default(0)
+  enhancementCount     Int      @default(0)
+  specialEnhancement   Int      @default(0)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@unique([playerId, upgradeType])
+  @@index([playerId])
+}
+
+model UnlockedSkill {
+  id         Int      @id @default(autoincrement())
+  playerId   Int
+  player     Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  skillId    String
+  unlockedAt DateTime @default(now())
+
+  @@unique([playerId, skillId])
+  @@index([playerId])
+}
+
+model Achievement {
+  id            Int      @id @default(autoincrement())
+  playerId      Int
+  player        Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  achievementId String
+  unlockedAt    DateTime @default(now())
+
+  @@unique([playerId, achievementId])
+  @@index([playerId])
+}
