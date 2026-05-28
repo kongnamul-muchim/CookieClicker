@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
-import { getOrCreatePlayer, updateCookies } from '@/lib/playerService'
-import { getUpgradesForPlayer, buyUpgrade } from '@/lib/upgradeService'
+import { getOrCreatePlayer, updateCookies, incrementStat } from '@/lib/playerService'
+import { getUpgradesForPlayer } from '@/lib/upgradeService'
 import { calculateStats, buildUpgradeState } from '@/lib/statsCalculator'
 import { calculateSkillEffects } from '@/config/skillEffects'
+import { getUpgradeConfig } from '@/config/upgrades'
+import { checkAchievements } from '@/lib/achievementChecker'
 
 // Buy 10 upgrades at once
 export async function POST(
@@ -25,12 +27,20 @@ export async function POST(
     
     const upgrade = upgrades.find((u) => u.upgradeType === type)
     const level = upgrade?.level || 0
+    const config = getUpgradeConfig(type)
     
-    // Calculate cost for 10 levels
+    if (!config) {
+      return NextResponse.json({ error: 'Invalid upgrade type' }, { status: 400 })
+    }
+    
+    // Calculate cost for up to 10 levels
     let totalCost = 0
     let currentLevel = level
-    for (let i = 0; i < 10; i++) {
-      const cost = Math.floor(15 * Math.pow(1.15, currentLevel)) // Base cost for cursor as example
+    let boughtCount = 0
+    const maxBatch = config.maxLevel !== null ? Math.min(10, config.maxLevel - level) : 10
+    
+    for (let i = 0; i < maxBatch; i++) {
+      const cost = Math.floor(config.baseCost * Math.pow(config.multiplier, currentLevel))
       if (player.cookies < totalCost + cost) {
         if (i === 0) {
           return NextResponse.json({ error: 'Not enough cookies' }, { status: 400 })
@@ -39,6 +49,7 @@ export async function POST(
       }
       totalCost += cost
       currentLevel++
+      boughtCount++
     }
 
     if (totalCost === 0) {
@@ -59,11 +70,15 @@ export async function POST(
       create: {
         playerId: player.id,
         upgradeType: type,
-        level: 10,
+        level: boughtCount,
       },
     })
 
     await updateCookies(sessionId, player.cookies - totalCost)
+    await incrementStat(sessionId, 'totalUpgradesBought', boughtCount)
+
+    // Check achievements
+    const newAchievements = await checkAchievements(sessionId)
 
     // Get updated state
     upgrades = await getUpgradesForPlayer(sessionId)
@@ -87,6 +102,7 @@ export async function POST(
       clickBoostMultiplier,
       prestigeCount: player.prestigeCount,
       prestigeStars: player.prestigeStars,
+      newAchievements,
     })
   } catch (error) {
     console.error('Error in /api/upgrade-batch:', error)

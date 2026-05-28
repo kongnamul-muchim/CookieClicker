@@ -40,8 +40,9 @@ export function calculateStats(
     const config = getUpgradeConfig(upgrade.upgradeType)
     if (!config) continue
 
-    baseCps += config.cpsBonus * upgrade.level
-    baseClick += config.clickBonus * upgrade.level
+    const enhanceMultiplier = 1 + 0.5 * (upgrade.enhancementCount || 0)
+    baseCps += config.cpsBonus * upgrade.level * enhanceMultiplier
+    baseClick += config.clickBonus * upgrade.level * enhanceMultiplier
   }
 
   // Apply skill effects

@@ -5,6 +5,7 @@ import { getOrCreatePlayer, updateCookies, incrementStat } from '@/lib/playerSer
 import { getUpgradesForPlayer } from '@/lib/upgradeService'
 import { calculateStats } from '@/lib/statsCalculator'
 import { calculateSkillEffects } from '@/config/skillEffects'
+import { checkAchievements } from '@/lib/achievementChecker'
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,13 +51,16 @@ export async function POST(request: NextRequest) {
     await incrementStat(sessionId, 'totalClicks', 1)
     await incrementStat(sessionId, 'totalCookiesEarned', earned)
 
+    // Check achievements
+    const newAchievements = await checkAchievements(sessionId)
+
     return NextResponse.json({
       cookies: newCookies,
       earned,
       isCrit,
       clickCritChance: effects.clickCritChance,
       clickCritMultiplier: effects.clickCritMultiplier,
-      newAchievements: [],
+      newAchievements,
     })
   } catch (error) {
     console.error('Error in /api/click:', error)

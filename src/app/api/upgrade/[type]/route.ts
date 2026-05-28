@@ -5,6 +5,7 @@ import { getOrCreatePlayer, updateCookies } from '@/lib/playerService'
 import { buyUpgrade, getUpgradesForPlayer } from '@/lib/upgradeService'
 import { calculateStats, buildUpgradeState } from '@/lib/statsCalculator'
 import { calculateSkillEffects } from '@/config/skillEffects'
+import { checkAchievements } from '@/lib/achievementChecker'
 
 export async function POST(
   request: NextRequest,
@@ -26,6 +27,9 @@ export async function POST(
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 400 })
     }
+
+    // Check achievements
+    const newAchievements = await checkAchievements(sessionId)
 
     // Get updated state
     const upgrades = await getUpgradesForPlayer(sessionId)
@@ -49,6 +53,7 @@ export async function POST(
       clickBoostMultiplier,
       prestigeCount: player.prestigeCount,
       prestigeStars: player.prestigeStars,
+      newAchievements,
     })
   } catch (error) {
     console.error('Error in /api/upgrade:', error)

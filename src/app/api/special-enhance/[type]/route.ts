@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { getOrCreatePlayer, updateCookies, incrementStat } from '@/lib/playerService'
 import { getUpgradesForPlayer } from '@/lib/upgradeService'
 import { getUpgradeConfig, calculateSpecialEnhancementCost } from '@/config/upgrades'
+import { checkAchievements } from '@/lib/achievementChecker'
 
 export async function POST(
   request: NextRequest,
@@ -47,10 +48,14 @@ export async function POST(
     await updateCookies(sessionId, player.cookies - cost)
     await incrementStat(sessionId, 'totalTranscends', 1)
 
+    // Check achievements
+    const newAchievements = await checkAchievements(sessionId)
+
     return NextResponse.json({
       success: true,
       cookies: player.cookies - cost,
       specialEnhancement: 1,
+      newAchievements,
     })
   } catch (error) {
     console.error('Error in /api/special-enhance:', error)

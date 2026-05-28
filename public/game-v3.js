@@ -728,12 +728,12 @@ async function loadStats() {
     const response = await fetch('/api/stats');
     const stats = await response.json();
     
-    document.getElementById('stat-total-clicks').textContent = formatNumber(stats.total_clicks || 0);
-    document.getElementById('stat-total-cookies').textContent = formatNumber(Math.floor(stats.total_cookies_earned || 0));
-    document.getElementById('stat-total-upgrades').textContent = formatNumber(stats.total_upgrades_bought || 0);
-    document.getElementById('stat-total-enhancements').textContent = formatNumber(stats.total_enhancements || 0);
-    document.getElementById('stat-total-transcends').textContent = formatNumber(stats.total_transcends || 0);
-    document.getElementById('stat-prestige-count').textContent = formatNumber(stats.prestige_count || 0);
+    document.getElementById('stat-total-clicks').textContent = formatNumber(stats.totalClicks || 0);
+    document.getElementById('stat-total-cookies').textContent = formatNumber(Math.floor(stats.totalCookiesEarned || 0));
+    document.getElementById('stat-total-upgrades').textContent = formatNumber(stats.totalUpgradesBought || 0);
+    document.getElementById('stat-total-enhancements').textContent = formatNumber(stats.totalEnhancements || 0);
+    document.getElementById('stat-total-transcends').textContent = formatNumber(stats.totalTranscends || 0);
+    document.getElementById('stat-prestige-count').textContent = formatNumber(stats.prestigeCount || 0);
   } catch (error) {
     console.error('Failed to load stats:', error);
   }

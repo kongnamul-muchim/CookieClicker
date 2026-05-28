@@ -3,17 +3,22 @@ import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { getOrCreatePlayer } from '@/lib/playerService'
 
-const ACHIEVEMENTS = {
+const ACHIEVEMENTS: Record<string, { name: string; description: string; icon: string }> = {
   first_click: { name: '첫 클릭', description: '처음으로 쿠키 클릭', icon: '👆' },
-  click_100: { name: '클릭 초보', description: '100 번 클릭', icon: '🖱️' },
-  click_1000: { name: '클릭 장인', description: '1,000 번 클릭', icon: '⚡' },
-  click_10000: { name: '클릭 마스터', description: '10,000 번 클릭', icon: '🏆' },
+  click_100: { name: '클릭 초보', description: '100번 클릭', icon: '🖱️' },
+  click_1000: { name: '클릭 장인', description: '1,000번 클릭', icon: '⚡' },
+  click_10000: { name: '클릭 마스터', description: '10,000번 클릭', icon: '🏆' },
   cookies_1000: { name: '쿠키 수집가', description: '총 1,000 쿠키 획득', icon: '🍪' },
   cookies_1000000: { name: '쿠키 부자', description: '총 1,000,000 쿠키 획득', icon: '💰' },
-  upgrade_10: { name: '업그레이드 시작', description: '10 개 업그레이드 구매', icon: '⬆️' },
+  cookies_1000000000: { name: '쿠키 대왕', description: '총 1,000,000,000 쿠키 획득', icon: '👑' },
+  upgrade_10: { name: '업그레이드 시작', description: '10개 업그레이드 구매', icon: '⬆️' },
+  upgrade_100: { name: '업그레이드 매니아', description: '100개 업그레이드 구매', icon: '📈' },
   enhance_1: { name: '강화 입문', description: '첫 강화', icon: '✨' },
+  enhance_10: { name: '강화 전문가', description: '10회 강화', icon: '💫' },
   transcend_1: { name: '초월자', description: '첫 초월', icon: '⚡' },
+  transcend_5: { name: '전설의 초월자', description: '5회 초월', icon: '🌟' },
   prestige_1: { name: '프레스티지', description: '첫 프레스티지', icon: '⭐' },
+  prestige_5: { name: '프레스티지 마스터', description: '5회 프레스티지', icon: '🌠' },
 }
 
 export async function GET() {

@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { getOrCreatePlayer, applyPrestige, getPrestigeData } from '@/lib/playerService'
 import { getUpgradesForPlayer } from '@/lib/upgradeService'
+import { checkAchievements } from '@/lib/achievementChecker'
 
 // Calculate stars earned based on total enhancements
 function calculateStarsEarned(upgrades: Array<{ enhancementCount: number }>): number {
@@ -37,7 +38,10 @@ export async function POST() {
     const starsEarned = calculateStarsEarned(upgrades)
     const result = await applyPrestige(sessionId, starsEarned)
 
-    return NextResponse.json(result)
+    // Check achievements
+    const newAchievements = await checkAchievements(sessionId)
+
+    return NextResponse.json({ ...result, newAchievements })
   } catch (error) {
     console.error('Error in /api/prestige:', error)
     return NextResponse.json(

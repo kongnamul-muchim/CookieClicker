@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { getOrCreatePlayer, updateCookies, incrementStat } from '@/lib/playerService'
 import { getUpgradesForPlayer } from '@/lib/upgradeService'
 import { getUpgradeConfig, calculateEnhancementCost } from '@/config/upgrades'
+import { checkAchievements } from '@/lib/achievementChecker'
 
 export async function POST(
   request: NextRequest,
@@ -47,6 +48,9 @@ export async function POST(
     await updateCookies(sessionId, player.cookies - cost)
     await incrementStat(sessionId, 'totalEnhancements', 1)
 
+    // Check achievements
+    const newAchievements = await checkAchievements(sessionId)
+
     // Get updated state
     const updatedUpgrades = await getUpgradesForPlayer(sessionId)
 
@@ -55,6 +59,7 @@ export async function POST(
       cookies: player.cookies - cost,
       enhancementCount: upgrade.enhancementCount + 1,
       upgrades: updatedUpgrades,
+      newAchievements,
     })
   } catch (error) {
     console.error('Error in /api/enhance:', error)

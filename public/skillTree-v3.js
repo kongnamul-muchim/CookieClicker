@@ -23,6 +23,12 @@ function renderSkillTree() {
   
   container.innerHTML = '';
   
+  if (!skillTreeState.allSkills || !Array.isArray(skillTreeState.allSkills)) {
+    console.warn('Skill tree data not available yet');
+    container.innerHTML = '<div class="skill-tree-loading">스킬 데이터를 불러오는 중...</div>';
+    return;
+  }
+  
   const tiers = {};
   for (const skill of skillTreeState.allSkills) {
     if (!tiers[skill.tier]) tiers[skill.tier] = [];
