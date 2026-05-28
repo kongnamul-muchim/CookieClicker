@@ -2,13 +2,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { getOrCreatePlayer, applyPrestige, getPrestigeData } from '@/lib/playerService'
-import { getUpgradesForPlayer } from '@/lib/upgradeService'
 import { checkAchievements } from '@/lib/achievementChecker'
 
-// Calculate stars earned based on total enhancements
-function calculateStarsEarned(upgrades: Array<{ enhancementCount: number }>): number {
-  const totalEnhancements = upgrades.reduce((sum, u) => sum + (u.enhancementCount || 0), 0)
-  return Math.floor(totalEnhancements / 10) // 1 star per 10 enhancements
+/**
+ * New prestige formula: stars = √(totalCookiesEarned / 1,000,000)
+ * 
+ * Examples:
+ *   1M cookies  →  1⭐
+ *  10M cookies  →  3⭐
+ * 100M cookies  → 10⭐
+ *   1B cookies  → 31⭐
+ *  10B cookies  → 100⭐
+ *   1T cookies  → 1,000⭐
+ */
+function calculateStarsEarned(totalCookiesEarned: number): number {
+  return Math.floor(Math.sqrt(totalCookiesEarned / 1_000_000))
 }
 
 export async function POST() {
@@ -21,22 +29,27 @@ export async function POST() {
     }
 
     const player = await getOrCreatePlayer(sessionId)
-    const upgrades = await getUpgradesForPlayer(sessionId)
 
-    const totalEnhancements = upgrades.reduce(
-      (sum, u) => sum + (u.enhancementCount || 0),
-      0
-    )
-
-    if (totalEnhancements === 0) {
+    if (player.totalCookiesEarned < 1_000_000) {
       return NextResponse.json(
-        { error: 'No enhancements to prestige' },
+        { error: 'Need at least 1M cookies earned to prestige' },
         { status: 400 }
       )
     }
 
-    const starsEarned = calculateStarsEarned(upgrades)
-    const result = await applyPrestige(sessionId, starsEarned)
+    const starsEarned = calculateStarsEarned(player.totalCookiesEarned)
+
+    // Past prestiges already gave stars — only earn the difference
+    const newStars = Math.max(0, starsEarned)
+
+    if (newStars <= 0) {
+      return NextResponse.json(
+        { error: 'No new stars to earn. Keep growing!' },
+        { status: 400 }
+      )
+    }
+
+    const result = await applyPrestige(sessionId, newStars)
 
     // Check achievements
     const newAchievements = await checkAchievements(sessionId)

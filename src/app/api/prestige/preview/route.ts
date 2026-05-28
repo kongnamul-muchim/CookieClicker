@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { getOrCreatePlayer, getPrestigeData } from '@/lib/playerService'
-import { getUpgradesForPlayer } from '@/lib/upgradeService'
+import { getOrCreatePlayer } from '@/lib/playerService'
 
-// Calculate stars earned based on total enhancements
-function calculateStarsEarned(upgrades: Array<{ enhancementCount: number }>): number {
-  const totalEnhancements = upgrades.reduce((sum, u) => sum + (u.enhancementCount || 0), 0)
-  return Math.floor(totalEnhancements / 10) // 1 star per 10 enhancements
+/**
+ * Preview stars that would be earned from prestige.
+ * Stars = √(totalCookiesEarned / 1,000,000)
+ */
+function calculateStarsEarned(totalCookiesEarned: number): number {
+  return Math.floor(Math.sqrt(totalCookiesEarned / 1_000_000))
 }
 
 export async function GET() {
@@ -18,17 +19,15 @@ export async function GET() {
       return NextResponse.json({ error: 'No session' }, { status: 401 })
     }
 
-    const upgrades = await getUpgradesForPlayer(sessionId)
-    const totalEnhancements = upgrades.reduce(
-      (sum, u) => sum + (u.enhancementCount || 0),
-      0
-    )
+    const player = await getOrCreatePlayer(sessionId)
 
-    const expectedStars = calculateStarsEarned(upgrades)
+    const expectedStars = calculateStarsEarned(player.totalCookiesEarned)
 
     return NextResponse.json({
-      totalEnhancements,
+      totalCookiesEarned: player.totalCookiesEarned,
       expectedStars,
+      prestigeCount: player.prestigeCount,
+      prestigeStars: player.prestigeStars,
     })
   } catch (error) {
     console.error('Error in /api/prestige/preview:', error)

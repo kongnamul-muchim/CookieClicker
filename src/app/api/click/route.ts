@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
-import { getOrCreatePlayer, updateCookies, incrementStat } from '@/lib/playerService'
+import { getOrCreatePlayer, incrementStat } from '@/lib/playerService'
 import { getUpgradesForPlayer } from '@/lib/upgradeService'
 import { calculateStats } from '@/lib/statsCalculator'
 import { calculateSkillEffects } from '@/config/skillEffects'
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     let earned = cookiesPerClick
 
-    // Click CPS bonus effect
+    // Click CPS bonus effect (wizard tower special)
     if (effects.clickCpsBonus && player.cookiesPerSecond) {
       earned += Math.floor(player.cookiesPerSecond * 0.01)
     }
@@ -45,9 +45,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const newCookies = player.cookies + earned
-
-    await updateCookies(sessionId, newCookies)
+    // Atomic increment — no race condition
+    await prisma.player.update({
+      where: { sessionId },
+      data: { cookies: { increment: earned } },
+    })
     await incrementStat(sessionId, 'totalClicks', 1)
     await incrementStat(sessionId, 'totalCookiesEarned', earned)
 
@@ -55,7 +57,7 @@ export async function POST(request: NextRequest) {
     const newAchievements = await checkAchievements(sessionId)
 
     return NextResponse.json({
-      cookies: newCookies,
+      cookies: player.cookies + earned,
       earned,
       isCrit,
       clickCritChance: effects.clickCritChance,

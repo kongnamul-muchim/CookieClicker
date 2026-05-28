@@ -178,15 +178,18 @@ async function rebirth() {
   try {
     const preview = await fetch('/api/prestige/preview').then(r => r.json());
     
-    if (preview.totalEnhancements === 0) {
-      showToast('강화가 없어 환생할 수 없습니다', 'warning');
+    if (preview.expectedStars < 1) {
+      showToast('별을 얻기에 충분한 쿠키를 모으지 못했습니다 (최소 100만 쿠키 필요)', 'warning');
       return;
     }
     
     const confirmed = confirm(
       `환생하면:\n` +
-      `- 모든 업그레이드 레벨/강화 리셋\n` +
-      `- ${preview.stars} ⭐ 획득\n\n` +
+      `- 모든 업그레이드 레벨 리셋\n` +
+      `- 모든 쿠키 초기화\n` +
+      `- 총 획득 쿠키: ${formatNumber(Math.floor(preview.totalCookiesEarned))}\n` +
+      `- 예상 획득 ⭐: ${preview.expectedStars}\n` +
+      `- 보유 ⭐: ${preview.prestigeStars}\n\n` +
       `확인을 누르면 환생합니다.`
     );
     
@@ -197,18 +200,18 @@ async function rebirth() {
     const response = await fetch('/api/prestige', { method: 'POST' });
     const result = await response.json();
     
-    if (result.success) {
-      showToast(`환생 완료! ${result.stars} ⭐ 획득`, 'success');
+    if (result.totalStars !== undefined) {
+      showToast(`환생 완료! ${result.starsEarned} ⭐ 획득 (총 ${result.totalStars} ⭐)`, 'success');
       if (typeof gameState !== 'undefined') {
         gameState.cookies = 0;
         gameState.cookiesPerClick = 1;
         gameState.cookiesPerSecond = 0;
-        gameState.upgrades = result.upgrades;
+        gameState.upgrades = result.upgrades || [];
         gameState.effects = {};
       }
       if (typeof updateUI === 'function') updateUI();
+      if (typeof renderUpgrades === 'function') renderUpgrades();
       loadSkillTree();
-      if (typeof syncGame === 'function') syncGame();
     }
   } catch (error) {
     console.error('Rebirth failed:', error);

@@ -343,6 +343,14 @@ header h1 {
   100% { background-position: -100% 0; }
 }
 
+/* Milestone star indicator */
+.milestone-star {
+  display: inline-block;
+  color: #f59e0b;
+  font-weight: 700;
+  font-size: 0.85em;
+}
+
 .upgrade-item:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 25px rgba(0,0,0,0.12);
@@ -629,25 +637,42 @@ header h1 {
 
 .progress-container { margin-top: 8px; }
 .progress-bar {
-  height: 6px;
+  height: 8px;
   background: #e0e0e0;
-  border-radius: 3px;
+  border-radius: 4px;
   overflow: hidden;
+  position: relative;
 }
 [data-theme="dark"] .progress-bar { background: #2d2d5a; }
-.progress-fill {
+.progress-fill-green {
+  position: absolute;
+  top: 0; left: 0;
   height: 100%;
-  border-radius: 3px;
+  border-radius: 4px;
   transition: width 0.3s ease;
   background: linear-gradient(90deg, #28a745, #20c997);
 }
-.progress-fill.high { background: linear-gradient(90deg, #ffc107, #ffdb4d); }
+.progress-fill-green.full {
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+}
+.progress-fill-blue {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+}
 .progress-text {
   display: flex;
   justify-content: space-between;
   font-size: 10px;
   color: var(--text-secondary);
   margin-top: 2px;
+}
+.progress-text .p-ready {
+  color: #22c55e;
+  font-weight: 600;
 }
 
 .container { position: relative; }

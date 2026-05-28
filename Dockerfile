@@ -1,6 +1,3 @@
-# ──────────────────────────────────────────────
-# Dockerfile - CookieClicker (Next.js)
-# ──────────────────────────────────────────────
 FROM node:20-alpine
 
 WORKDIR /app
@@ -15,6 +12,9 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npx prisma generate && npx next build
 
-EXPOSE 3000
+# Copy public/ static files into standalone build
+RUN cp -r public .next/standalone/
 
-CMD ["npm", "start"]
+EXPOSE 3002
+
+CMD ["node", ".next/standalone/server.js"]

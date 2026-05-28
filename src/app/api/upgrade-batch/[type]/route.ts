@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/prisma'
-import { getOrCreatePlayer, updateCookies, incrementStat } from '@/lib/playerService'
-import { getUpgradesForPlayer } from '@/lib/upgradeService'
+import { getOrCreatePlayer } from '@/lib/playerService'
+import { buyUpgradeBatch, getUpgradesForPlayer } from '@/lib/upgradeService'
 import { calculateStats, buildUpgradeState } from '@/lib/statsCalculator'
 import { calculateSkillEffects } from '@/config/skillEffects'
-import { getUpgradeConfig } from '@/config/upgrades'
 import { checkAchievements } from '@/lib/achievementChecker'
 
-// Buy 10 upgrades at once
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ type: string }> }
@@ -22,66 +20,23 @@ export async function POST(
       return NextResponse.json({ error: 'No session' }, { status: 401 })
     }
 
-    let player = await getOrCreatePlayer(sessionId)
-    let upgrades = await getUpgradesForPlayer(sessionId)
-    
-    const upgrade = upgrades.find((u) => u.upgradeType === type)
-    const level = upgrade?.level || 0
-    const config = getUpgradeConfig(type)
-    
-    if (!config) {
-      return NextResponse.json({ error: 'Invalid upgrade type' }, { status: 400 })
-    }
-    
-    // Calculate cost for up to 10 levels
-    let totalCost = 0
-    let currentLevel = level
-    let boughtCount = 0
-    const maxBatch = config.maxLevel !== null ? Math.min(10, config.maxLevel - level) : 10
-    
-    for (let i = 0; i < maxBatch; i++) {
-      const cost = Math.floor(config.baseCost * Math.pow(config.multiplier, currentLevel))
-      if (player.cookies < totalCost + cost) {
-        if (i === 0) {
-          return NextResponse.json({ error: 'Not enough cookies' }, { status: 400 })
-        }
-        break
-      }
-      totalCost += cost
-      currentLevel++
-      boughtCount++
-    }
+    const player = await getOrCreatePlayer(sessionId)
 
-    if (totalCost === 0) {
-      return NextResponse.json({ error: 'Cannot afford any upgrades' }, { status: 400 })
+    // Support both single buy (count=1) and batch buy (default 10)
+    const body = await request.json().catch(() => ({}))
+    const count = body.count || 10
+
+    const result = await buyUpgradeBatch(sessionId, type, player.cookies, count)
+
+    if (!result.success) {
+      return NextResponse.json({ error: result.error }, { status: 400 })
     }
-
-    // Update upgrade level
-    await prisma.upgrade.upsert({
-      where: {
-        playerId_upgradeType: {
-          playerId: player.id,
-          upgradeType: type,
-        },
-      },
-      update: {
-        level: currentLevel,
-      },
-      create: {
-        playerId: player.id,
-        upgradeType: type,
-        level: boughtCount,
-      },
-    })
-
-    await updateCookies(sessionId, player.cookies - totalCost)
-    await incrementStat(sessionId, 'totalUpgradesBought', boughtCount)
 
     // Check achievements
     const newAchievements = await checkAchievements(sessionId)
 
     // Get updated state
-    upgrades = await getUpgradesForPlayer(sessionId)
+    const upgrades = await getUpgradesForPlayer(sessionId)
     const unlockedSkillsData = await prisma.unlockedSkill.findMany({
       where: { playerId: player.id },
     })
@@ -89,12 +44,12 @@ export async function POST(
     const skillEffects = calculateSkillEffects(unlockedSkillIds)
 
     const { cookiesPerClick, cookiesPerSecond, effects, clickBoostMultiplier } =
-      calculateStats(upgrades, player.cookies - totalCost, skillEffects)
+      calculateStats(upgrades, result.newCookies || 0, skillEffects)
 
     const upgradeList = buildUpgradeState(upgrades, effects)
 
     return NextResponse.json({
-      cookies: player.cookies - totalCost,
+      cookies: result.newCookies,
       cookiesPerClick,
       cookiesPerSecond,
       upgrades: upgradeList,
@@ -107,7 +62,7 @@ export async function POST(
   } catch (error) {
     console.error('Error in /api/upgrade-batch:', error)
     return NextResponse.json(
-      { error: 'Failed to buy batch upgrade' },
+      { error: 'Failed to buy upgrade batch' },
       { status: 500 }
     )
   }

@@ -6,8 +6,6 @@ export interface UpgradeData {
   playerId: number
   upgradeType: string
   level: number
-  enhancementCount: number
-  specialEnhancement: number
 }
 
 export async function getUpgradesForPlayer(sessionId: string): Promise<UpgradeData[]> {
@@ -69,9 +67,6 @@ export async function buyUpgrade(
     return { success: false, error: 'Not enough cookies' }
   }
 
-  // Calculate new CPS
-  const newCookiesPerSecond = player.cookiesPerSecond + config.cpsBonus
-
   upgrade = await prisma.upgrade.upsert({
     where: {
       playerId_upgradeType: {
@@ -93,7 +88,6 @@ export async function buyUpgrade(
     where: { sessionId },
     data: {
       cookies: currentCookies - cost,
-      cookiesPerSecond: newCookiesPerSecond,
       totalUpgradesBought: { increment: 1 },
     },
   })
@@ -105,14 +99,16 @@ export async function buyUpgrade(
   }
 }
 
-export async function enhance(
+export async function buyUpgradeBatch(
   sessionId: string,
   upgradeType: string,
-  currentCookies: number
+  currentCookies: number,
+  count: number = 10
 ): Promise<{
   success: boolean
   error?: string
   newCookies?: number
+  levelsBought?: number
 }> {
   const player = await prisma.player.findUnique({
     where: { sessionId },
@@ -129,86 +125,48 @@ export async function enhance(
   }
 
   let upgrade = player.upgrades.find((u) => u.upgradeType === upgradeType)
-  if (!upgrade || upgrade.level === 0) {
-    return { success: false, error: 'Upgrade not purchased' }
+  const startLevel = upgrade?.level || 0
+
+  // Calculate total cost for `count` levels
+  let totalCost = 0
+  for (let i = 0; i < count; i++) {
+    totalCost += calculateUpgradeCost(config.baseCost, startLevel + i)
   }
 
-  const cost = config.baseCost * 100 // Enhancement cost
-  if (currentCookies < cost) {
+  if (currentCookies < totalCost) {
     return { success: false, error: 'Not enough cookies' }
   }
 
-  await prisma.upgrade.update({
-    where: { id: upgrade.id },
-    data: {
-      enhancementCount: { increment: 1 },
+  const newLevel = startLevel + count
+
+  upgrade = await prisma.upgrade.upsert({
+    where: {
+      playerId_upgradeType: {
+        playerId: player.id,
+        upgradeType,
+      },
+    },
+    update: {
+      level: newLevel,
+    },
+    create: {
+      playerId: player.id,
+      upgradeType,
+      level: count,
     },
   })
 
   await prisma.player.update({
     where: { sessionId },
     data: {
-      cookies: currentCookies - cost,
-      totalEnhancements: { increment: 1 },
+      cookies: currentCookies - totalCost,
+      totalUpgradesBought: { increment: count },
     },
   })
 
   return {
     success: true,
-    newCookies: currentCookies - cost,
-  }
-}
-
-export async function specialEnhance(
-  sessionId: string,
-  upgradeType: string,
-  currentCookies: number
-): Promise<{
-  success: boolean
-  error?: string
-  newCookies?: number
-}> {
-  const player = await prisma.player.findUnique({
-    where: { sessionId },
-    include: { upgrades: true },
-  })
-
-  if (!player) {
-    return { success: false, error: 'Player not found' }
-  }
-
-  const config = getUpgradeConfig(upgradeType)
-  if (!config) {
-    return { success: false, error: 'Invalid upgrade type' }
-  }
-
-  let upgrade = player.upgrades.find((u) => u.upgradeType === upgradeType)
-  if (!upgrade || upgrade.level === 0) {
-    return { success: false, error: 'Upgrade not purchased' }
-  }
-
-  const cost = config.baseCost * 1000 // Special enhancement cost
-  if (currentCookies < cost) {
-    return { success: false, error: 'Not enough cookies' }
-  }
-
-  await prisma.upgrade.update({
-    where: { id: upgrade.id },
-    data: {
-      specialEnhancement: 1,
-    },
-  })
-
-  await prisma.player.update({
-    where: { sessionId },
-    data: {
-      cookies: currentCookies - cost,
-      totalTranscends: { increment: 1 },
-    },
-  })
-
-  return {
-    success: true,
-    newCookies: currentCookies - cost,
+    newCookies: currentCookies - totalCost,
+    levelsBought: count,
   }
 }

@@ -46,28 +46,16 @@ const upgradeNames = {
 };
 
 const upgradeDescriptions = {
-  click_boost: '클릭당 +2 쿠키',
+  click_boost: '클릭당 +1 쿠키',
   cursor: '초당 +0.1 쿠키',
   grandma: '초당 +1 쿠키',
-  farm: '초당 +15 쿠키',
-  mine: '초당 +150 쿠키',
-  factory: '초당 +1,200 쿠키',
-  bank: '초당 +12,000 쿠키',
-  temple: '초당 +100,000 쿠키',
-  wizard_tower: '초당 +800,000 쿠키',
-  portal: '초당 +5,000,000 쿠키'
-};
-
-const specialEffectDescriptions = {
-  click_crit_5pct_5x: '만렙: 클릭 크리티컬 5%, 5배',
-  auto_crit_5pct_5x: '만렙: 자동 생산 크리티컬 5%, 5배',
-  crit_chance_15pct: '만렙: 크리티컬 확률 +15%',
-  production_1_2x: '만렙: 모든 생산량 1.2배',
-  production_1_5x: '만렙: 모든 생산량 1.5배',
-  production_2x: '만렙: 모든 생산량 2배',
-  cost_10pct_discount: '만렙: 비용 10% 할인',
-  interest_0_1pct: '만렙: 쿠키의 0.1% 매초 획득',
-  click_cps_1pct: '만렙: 클릭당 초당 쿠키의 1% 추가'
+  farm: '초당 +8 쿠키',
+  mine: '초당 +47 쿠키',
+  factory: '초당 +260 쿠키',
+  bank: '초당 +1,400 쿠키',
+  temple: '초당 +7,800 쿠키',
+  wizard_tower: '초당 +44,000 쿠키',
+  portal: '초당 +260,000 쿠키'
 };
 
 function formatNumber(num) {
@@ -92,69 +80,89 @@ function updateUI() {
   document.getElementById('cookie-count').textContent = formatNumber(gameState.cookies);
   document.getElementById('cookies-per-click').textContent = formatNumber(gameState.cookiesPerClick);
   document.getElementById('cookies-per-second').textContent = formatNumber(gameState.cookiesPerSecond);
-  
-  updateUpgradeButtons();
 }
 
 function updateUpgradeButtons() {
-  const buttons = document.querySelectorAll('.buy-button');
-  buttons.forEach(btn => {
-    const type = btn.dataset.type;
+  const items = document.querySelectorAll('.upgrade-item');
+  items.forEach(item => {
+    const type = item.dataset.type;
     const upgrade = gameState.upgrades.find(u => u.type === type);
-    if (upgrade) {
-      if (upgrade.canEnhance && !btn.classList.contains('enhance-button')) {
-        updateEnhanceButton(btn, upgrade);
-      } else if (!upgrade.canEnhance && btn.classList.contains('enhance-button')) {
-        updateNormalButton(btn, upgrade);
-      }
-      
-      if (upgrade.isMaxLevel && !upgrade.canEnhance && !upgrade.canSpecialEnhance) {
-        btn.disabled = true;
-        btn.textContent = 'MAX';
-        btn.classList.add('max-level');
-      } else if (upgrade.canSpecialEnhance) {
-        btn.disabled = gameState.cookies < upgrade.specialEnhanceCost;
+    if (!upgrade) return;
+
+    const canAfford = gameState.cookies >= upgrade.cost;
+    const canAffordBatch = upgrade.batchCost && gameState.cookies >= upgrade.batchCost;
+
+    item.classList.remove('can-afford-single', 'can-afford-batch');
+    if (canAffordBatch) {
+      item.classList.add('can-afford-batch');
+    } else if (canAfford) {
+      item.classList.add('can-afford-single');
+    }
+
+    const buyBtn = item.querySelector('[data-action="buy"]');
+    if (buyBtn) {
+      buyBtn.disabled = !canAfford;
+      buyBtn.textContent = '+1';
+    }
+
+    const batchBtn = item.querySelector('[data-action="buy-batch"]');
+    if (batchBtn) {
+      batchBtn.disabled = !canAffordBatch;
+      const nextMilestone = Math.ceil((upgrade.level + 1) / 10) * 10;
+      const levelsToBuy = nextMilestone - upgrade.level;
+      batchBtn.textContent = `+${levelsToBuy < 10 ? levelsToBuy : 10}`;
+    }
+
+    // Progress bar - 2-stage: green fills toward +1, then blue overflows toward +10
+    const fillGreen = item.querySelector('.progress-fill-green');
+    const fillBlue = item.querySelector('.progress-fill-blue');
+    const progressText = item.querySelector('.progress-text');
+    if (fillGreen && fillBlue && progressText) {
+      const cost = upgrade.cost;
+      const batchCost = upgrade.batchCost;
+      const cookies = gameState.cookies;
+      const canAffordOne = cookies >= cost;
+
+      // Green: 0-100% toward +1 cost
+      const greenPct = Math.min(100, (cookies / cost) * 100);
+      fillGreen.style.width = greenPct + '%';
+      fillGreen.classList.toggle('full', canAffordOne);
+
+      // Blue: overflow from +1 cost toward +10 cost
+      if (canAffordOne && batchCost > cost) {
+        const overflow = cookies - cost;
+        const overflowTotal = batchCost - cost;
+        const bluePct = Math.min(100, (overflow / overflowTotal) * 100);
+        fillBlue.style.width = bluePct + '%';
       } else {
-        btn.disabled = gameState.cookies < (upgrade.canEnhance ? upgrade.enhanceCost : upgrade.cost);
+        fillBlue.style.width = '0%';
       }
+
+      // Text
+      const canAffordTen = canAffordOne && cookies >= batchCost;
+      let text;
+      if (canAffordTen) {
+        text = `<span class="p-ready">✅ +10 가능!</span><span>${formatNumber(cookies)} / ${formatNumber(batchCost)}</span>`;
+      } else if (canAffordOne) {
+        text = `<span class="p-ready">✅ +1 가능</span><span>${formatNumber(cookies)} / ${formatNumber(batchCost)}</span><span>${Math.floor(((cookies - cost) / (batchCost - cost)) * 100)}%</span>`;
+      } else {
+        text = `<span>${formatNumber(cookies)} / ${formatNumber(cost)}</span><span>${Math.floor((cookies / cost) * 100)}%</span>`;
+      }
+      progressText.innerHTML = text;
     }
   });
-}
-
-function updateEnhanceButton(btn, upgrade) {
-  btn.textContent = '강화';
-  btn.classList.add('enhance-button');
-  btn.dataset.action = 'enhance';
-  const costSpan = btn.parentElement.querySelector('.upgrade-cost');
-  if (costSpan) {
-    costSpan.textContent = '강화 비용: ' + formatNumber(upgrade.enhanceCost) + '개';
-  }
-}
-
-function updateNormalButton(btn, upgrade) {
-  btn.textContent = '구매';
-  btn.classList.remove('enhance-button');
-  btn.dataset.action = 'buy';
-  const costSpan = btn.parentElement.querySelector('.upgrade-cost');
-  if (costSpan) {
-    costSpan.textContent = '비용: ' + formatNumber(upgrade.cost) + '개';
-  }
 }
 
 function createUpgradeItem(upgrade) {
   const name = upgradeNames[upgrade.type] || upgrade.type;
   const description = upgradeDescriptions[upgrade.type] || '';
-  const specialDesc = specialEffectDescriptions[upgrade.specialEffect] || '';
-  const isMaxLevelEffectActive = upgrade.isMaxLevel && upgrade.specialEffect;
-  const specialEnhanceCost = upgrade.specialEnhanceCost || 0;
-  const canAffordSpecial = upgrade.canSpecialEnhance && specialEnhanceCost > 0 && gameState.cookies >= specialEnhanceCost;
-  const canAffordEnhance = upgrade.canEnhance && !upgrade.canSpecialEnhance && gameState.cookies >= upgrade.enhanceCost;
-  const canAfford = !upgrade.canEnhance && !upgrade.canSpecialEnhance && gameState.cookies >= upgrade.cost;
-  const canAffordBatch = !upgrade.canEnhance && !upgrade.canSpecialEnhance && upgrade.batchCost && gameState.cookies >= upgrade.batchCost;
-  const canBuy = canAfford || canAffordBatch || canAffordSpecial || canAffordEnhance;
+  const canAfford = gameState.cookies >= upgrade.cost;
+  const canAffordBatch = upgrade.batchCost && gameState.cookies >= upgrade.batchCost;
+  const canBuy = canAfford || canAffordBatch;
+
   const item = document.createElement('div');
   let itemClass = 'upgrade-item';
-  if (canAffordBatch || canAffordSpecial || canAffordEnhance) {
+  if (canAffordBatch) {
     itemClass += ' can-afford-batch';
   } else if (canAfford) {
     itemClass += ' can-afford-single';
@@ -162,115 +170,76 @@ function createUpgradeItem(upgrade) {
   item.className = itemClass;
   item.dataset.type = upgrade.type;
   const icon = upgradeIcons[upgrade.type] || '🍪';
-  
-  let enhancementText = '';
-  if (upgrade.enhancementCount > 0) {
-    enhancementText = ` (강화 x${upgrade.enhancementCount})`;
-  }
-  
-  if (upgrade.specialEnhancement) {
-    enhancementText += ' ⭐';
-  }
-  
-  let levelText = upgrade.maxLevel 
-    ? `Lv.${upgrade.level}/${upgrade.maxLevel}` 
+
+  // Level display with milestone indicator
+  const milestoneNum = upgrade.milestoneMultiplier;
+  const levelDisplay = milestoneNum > 1
+    ? `Lv.${upgrade.level} <span class="milestone-star">✦×${milestoneNum}</span>`
     : `Lv.${upgrade.level}`;
-  
-  let costText = '';
-  let targetCost = 0;
-  
-  if (upgrade.canSpecialEnhance) {
-    costText = `초월: ${formatNumber(specialEnhanceCost)}개 (클릭강화 2배)`;
-    targetCost = specialEnhanceCost;
-  } else if (upgrade.isMaxLevel) {
-    costText = '최대 레벨 달성';
-    targetCost = 0;
-  } else if (upgrade.canEnhance) {
-    costText = `강화 비용: ${formatNumber(upgrade.enhanceCost)}개`;
-    targetCost = upgrade.enhanceCost;
-  } else {
-    costText = `비용: ${formatNumber(upgrade.cost)}개`;
-    targetCost = upgrade.batchCost || upgrade.cost;
-  }
-  
-  const progressPercent = calculateProgress(gameState.cookies, targetCost);
-  
+
+  // Calculate initial progress values
+  const cost = upgrade.cost;
+  const batchCost = upgrade.batchCost;
+  const cookies = gameState.cookies;
+  const canAffordOne = cookies >= cost;
+  const greenPct = Math.min(100, (cookies / cost) * 100);
+  const bluePct = canAffordOne && batchCost > cost
+    ? Math.min(100, ((cookies - cost) / (batchCost - cost)) * 100) : 0;
+  const canAffordTen = canAffordOne && cookies >= batchCost;
+
   item.innerHTML = `
     <div class="upgrade-header">
       <div class="upgrade-icon">${icon}</div>
       <div class="upgrade-content">
-        <div class="upgrade-name">${name} (${levelText})${enhancementText}</div>
+        <div class="upgrade-name">${name} (${levelDisplay})</div>
         <div class="upgrade-details">
-          <span>${description}</span>
-          ${specialDesc ? `<span class="special-effect${isMaxLevelEffectActive ? ' active' : ''}">${specialDesc}${isMaxLevelEffectActive ? ' ✅' : ''}</span>` : ''}
-          <span class="upgrade-cost">${costText}</span>
+          <span>${description} | Lv.당 ${upgrade.cpsBonus > 0 ? `+${upgrade.cpsBonus} CPS` : `+${upgrade.clickBonus} 클릭`}</span>
           <div class="progress-container">
             <div class="progress-bar">
-              <div class="progress-fill ${progressPercent >= 90 ? 'high' : ''}" style="width: ${progressPercent}%"></div>
+              <div class="progress-fill-green ${canAffordOne ? 'full' : ''}" style="width: ${greenPct}%"></div>
+              <div class="progress-fill-blue" style="width: ${canAffordOne ? bluePct : 0}%"></div>
             </div>
             <div class="progress-text">
-              <span>${formatNumber(gameState.cookies)} / ${formatNumber(targetCost)}</span>
-              <span>${progressPercent}%</span>
+              ${canAffordTen
+                ? `<span class="p-ready">✅ +10 가능!</span><span>${formatNumber(cookies)} / ${formatNumber(batchCost)}</span>`
+                : canAffordOne
+                  ? `<span class="p-ready">✅ +1 가능</span><span>${formatNumber(cookies)} / ${formatNumber(batchCost)}</span><span>${Math.floor(((cookies - cost) / (batchCost - cost)) * 100)}%</span>`
+                  : `<span>${formatNumber(cookies)} / ${formatNumber(cost)}</span><span>${Math.floor((cookies / cost) * 100)}%</span>`
+              }
             </div>
           </div>
         </div>
       </div>
     </div>
   `;
-  
+
   const buttonContainer = document.createElement('div');
   buttonContainer.className = 'button-container';
-  
-  if (upgrade.canSpecialEnhance) {
-    const btn = document.createElement('button');
-    btn.className = 'buy-button special-enhance-button';
-    btn.dataset.type = upgrade.type;
-    btn.dataset.action = 'special-enhance';
-    btn.dataset.cost = specialEnhanceCost;
-    btn.disabled = !canAffordSpecial;
-    btn.textContent = '⚡초월⚡';
-    buttonContainer.appendChild(btn);
-  } else if (upgrade.isMaxLevel) {
-    const btn = document.createElement('button');
-    btn.className = 'buy-button max-level';
-    btn.disabled = true;
-    btn.textContent = upgrade.specialEnhancement ? '✨초월✨' : 'MAX';
-    buttonContainer.appendChild(btn);
-  } else if (upgrade.canEnhance) {
-    const btn = document.createElement('button');
-    btn.className = 'buy-button enhance-button';
-    btn.dataset.type = upgrade.type;
-    btn.dataset.action = 'enhance';
-    btn.disabled = !canAfford;
-    btn.textContent = '강화';
-    buttonContainer.appendChild(btn);
-  } else {
-    const group = document.createElement('div');
-    group.className = 'button-group';
-    
-    const btn1 = document.createElement('button');
-    btn1.className = 'buy-button';
-    btn1.dataset.type = upgrade.type;
-    btn1.dataset.action = 'buy';
-    btn1.disabled = !canAfford;
-    btn1.textContent = '+1';
-    
-    const btn2 = document.createElement('button');
-    btn2.className = 'buy-button batch-button';
-    btn2.dataset.type = upgrade.type;
-    btn2.dataset.action = 'buy-batch';
-    btn2.disabled = !canAffordBatch;
-    
-    const nextMilestone2 = Math.ceil((upgrade.level + 1) / 10) * 10;
-    const targetLevel2 = upgrade.maxLevel ? Math.min(nextMilestone2, upgrade.maxLevel) : nextMilestone2;
-    const levelsToBuy2 = targetLevel2 - upgrade.level;
-    btn2.textContent = levelsToBuy2 < 10 ? `+${levelsToBuy2}` : '+10';
-    
-    group.appendChild(btn1);
-    group.appendChild(btn2);
-    buttonContainer.appendChild(group);
-  }
-  
+
+  const group = document.createElement('div');
+  group.className = 'button-group';
+
+  const btn1 = document.createElement('button');
+  btn1.className = 'buy-button';
+  btn1.dataset.type = upgrade.type;
+  btn1.dataset.action = 'buy';
+  btn1.disabled = !canAfford;
+  btn1.textContent = '+1';
+
+  const btn2 = document.createElement('button');
+  btn2.className = 'buy-button batch-button';
+  btn2.dataset.type = upgrade.type;
+  btn2.dataset.action = 'buy-batch';
+  btn2.disabled = !canAffordBatch;
+
+  const nextMilestone2 = Math.ceil((upgrade.level + 1) / 10) * 10;
+  const levelsToBuy2 = nextMilestone2 - upgrade.level;
+  btn2.textContent = `+${levelsToBuy2 < 10 ? levelsToBuy2 : 10}`;
+
+  group.appendChild(btn1);
+  group.appendChild(btn2);
+  buttonContainer.appendChild(group);
+
   item.appendChild(buttonContainer);
   return item;
 }
@@ -283,65 +252,6 @@ function renderUpgrades() {
   gameState.upgrades.forEach(upgrade => {
     const item = createUpgradeItem(upgrade);
     container.appendChild(item);
-  });
-}
-
-function updateUpgrades() {
-  gameState.upgrades.forEach(upgrade => {
-    const item = document.querySelector(`.upgrade-item[data-type="${upgrade.type}"]`);
-    if (!item) return;
-    
-    const specialEnhanceCost = upgrade.specialEnhanceCost || 0;
-    const canAffordSpecial = upgrade.canSpecialEnhance && specialEnhanceCost > 0 && gameState.cookies >= specialEnhanceCost;
-    const canAffordEnhance = upgrade.canEnhance && !upgrade.canSpecialEnhance && gameState.cookies >= upgrade.enhanceCost;
-    const canAfford = !upgrade.canEnhance && !upgrade.canSpecialEnhance && gameState.cookies >= upgrade.cost;
-    const canAffordBatch = !upgrade.canEnhance && !upgrade.canSpecialEnhance && upgrade.batchCost && gameState.cookies >= upgrade.batchCost;
-    
-    item.classList.remove('can-afford-single', 'can-afford-batch');
-    if (canAffordBatch) {
-      item.classList.add('can-afford-batch');
-    } else if (canAffordSpecial || canAffordEnhance) {
-      item.classList.add('can-afford-single');
-    } else if (canAfford) {
-      item.classList.add('can-afford-single');
-    }
-    
-    const specialBtn = item.querySelector('[data-action="special-enhance"]');
-    if (specialBtn) {
-      specialBtn.disabled = !canAffordSpecial;
-    }
-    
-    const enhanceBtn = item.querySelector('[data-action="enhance"]');
-    if (enhanceBtn) {
-      enhanceBtn.disabled = !canAffordEnhance;
-    }
-    
-    const buyBtn = item.querySelector('[data-action="buy"]');
-    if (buyBtn) {
-      buyBtn.disabled = !canAfford;
-    }
-    
-    const batchBtn = item.querySelector('[data-action="buy-batch"]');
-    if (batchBtn) {
-      batchBtn.disabled = !canAffordBatch;
-    }
-    
-    const progressFill = item.querySelector('.progress-fill');
-    const progressText = item.querySelector('.progress-text');
-    if (progressFill && progressText) {
-      let targetCost;
-      if (upgrade.canSpecialEnhance && specialEnhanceCost > 0) {
-        targetCost = specialEnhanceCost;
-      } else if (upgrade.canEnhance) {
-        targetCost = upgrade.enhanceCost;
-      } else {
-        targetCost = upgrade.batchCost || upgrade.cost;
-      }
-      const progressPercent = calculateProgress(gameState.cookies, targetCost);
-      progressFill.style.width = progressPercent + '%';
-      progressFill.classList.toggle('high', progressPercent >= 90);
-      progressText.innerHTML = `<span>${formatNumber(gameState.cookies)} / ${formatNumber(targetCost)}</span><span>${progressPercent}%</span>`;
-    }
   });
 }
 
@@ -371,7 +281,6 @@ async function handleClick(event) {
   const effects = gameState.effects || {};
   let earned = gameState.cookiesPerClick;
   let isCritical = false;
-  let critMultiplier = 1;
   
   if (effects.clickCpsBonus) {
     earned += Math.floor(gameState.cookiesPerSecond * 0.01);
@@ -380,7 +289,7 @@ async function handleClick(event) {
   const totalCritChance = effects.clickCritChance || 0;
   const critMulti = effects.clickCritMultiplier || 1;
   
-  critMultiplier = tryCritical(totalCritChance, critMulti);
+  const critMultiplier = tryCritical(totalCritChance, critMulti);
   if (critMultiplier > 1) {
     isCritical = true;
     earned = Math.floor(earned * critMultiplier);
@@ -461,10 +370,21 @@ function playClickParticles(e, isCritical) {
   }
 }
 
+async function syncGame() {
+  try {
+    await fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cookies: gameState.cookies })
+    });
+  } catch (error) {
+    console.error('Sync failed:', error);
+  }
+}
+
 async function buyUpgrade(type) {
   try {
     await syncGame();
-    
     const response = await fetch(`/api/upgrade/${type}`, { method: 'POST' });
     
     if (response.ok) {
@@ -486,7 +406,6 @@ async function buyUpgrade(type) {
 async function buyUpgradeBatch(type) {
   try {
     await syncGame();
-    
     const response = await fetch(`/api/upgrade-batch/${type}`, { method: 'POST' });
     
     if (response.ok) {
@@ -502,64 +421,6 @@ async function buyUpgradeBatch(type) {
   } catch (error) {
     console.error('Batch upgrade failed:', error);
     showToast('대량 구매 실패', 'error');
-  }
-}
-
-async function enhanceUpgrade(type) {
-  try {
-    await syncGame();
-    
-    const response = await fetch(`/api/enhance/${type}`, { method: 'POST' });
-    
-    if (response.ok) {
-      gameState = await response.json();
-      renderUpgrades();
-      updateUI();
-      const name = upgradeNames[type] || type;
-      showToast(`${name} 강화 완료!`, 'success');
-    } else {
-      const error = await response.json();
-      showToast(error.error, 'error');
-    }
-  } catch (error) {
-    console.error('Enhance failed:', error);
-    showToast('강화 실패', 'error');
-  }
-}
-
-async function specialEnhanceUpgrade(type) {
-  try {
-    await syncGame();
-    
-    const response = await fetch(`/api/special-enhance/${type}`, { method: 'POST' });
-    
-    if (response.ok) {
-      gameState = await response.json();
-      renderUpgrades();
-      updateUI();
-      showToast('⚡초월 완료! 클릭 강화 2배!', 'success');
-    } else {
-      const error = await response.json();
-      showToast(error.error, 'error');
-    }
-  } catch (error) {
-    console.error('Special enhance failed:', error);
-    showToast('초월 실패', 'error');
-  }
-}
-
-let syncEnabled = true;
-
-async function syncGame() {
-  if (!syncEnabled) return;
-  try {
-    await fetch('/api/sync', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cookies: gameState.cookies })
-    });
-  } catch (error) {
-    console.error('Sync failed:', error);
   }
 }
 
@@ -595,8 +456,10 @@ function showAutoCrit(amount) {
   setTimeout(() => crit.remove(), 500);
 }
 
-function startSync() {
-  setInterval(syncGame, 5000);
+function startUIUpdate() {
+  setInterval(() => {
+    updateUpgradeButtons();
+  }, 1000);
 }
 
 document.getElementById('cookie-btn').addEventListener('click', handleClick);
@@ -605,11 +468,7 @@ function handleUpgradeClick(e) {
   if (e.target.classList.contains('buy-button') && !e.target.disabled) {
     const action = e.target.dataset.action;
     const type = e.target.dataset.type;
-    if (action === 'enhance') {
-      enhanceUpgrade(type);
-    } else if (action === 'special-enhance') {
-      specialEnhanceUpgrade(type);
-    } else if (action === 'buy-batch') {
+    if (action === 'buy-batch') {
       buyUpgradeBatch(type);
     } else {
       buyUpgrade(type);
@@ -731,8 +590,8 @@ async function loadStats() {
     document.getElementById('stat-total-clicks').textContent = formatNumber(stats.totalClicks || 0);
     document.getElementById('stat-total-cookies').textContent = formatNumber(Math.floor(stats.totalCookiesEarned || 0));
     document.getElementById('stat-total-upgrades').textContent = formatNumber(stats.totalUpgradesBought || 0);
-    document.getElementById('stat-total-enhancements').textContent = formatNumber(stats.totalEnhancements || 0);
-    document.getElementById('stat-total-transcends').textContent = formatNumber(stats.totalTranscends || 0);
+    document.getElementById('stat-total-enhancements').textContent = formatNumber(0);
+    document.getElementById('stat-total-transcends').textContent = formatNumber(0);
     document.getElementById('stat-prestige-count').textContent = formatNumber(stats.prestigeCount || 0);
   } catch (error) {
     console.error('Failed to load stats:', error);
@@ -762,10 +621,8 @@ async function loadAchievements() {
   }
 }
 
-function startUIUpdate() {
-  setInterval(() => {
-    updateUpgrades();
-  }, 1000);
+function startSync() {
+  setInterval(syncGame, 5000);
 }
 
 loadGame();

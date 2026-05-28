@@ -1,6 +1,6 @@
 import { UpgradeData } from '../lib/upgradeService'
 import { SkillEffect } from '../config/skillEffects'
-import { getUpgradeConfig } from '../config/upgrades'
+import { getUpgradeConfig, getMilestoneMultiplier } from '../config/upgrades'
 
 export interface GameState {
   cookies: number
@@ -10,11 +10,10 @@ export interface GameState {
     type: string
     level: number
     cost: number
+    batchCost: number
     cpsBonus: number
-    canEnhance: boolean
-    canSpecialEnhance: boolean
-    enhancementCount: number
-    specialEnhancement: number
+    clickBonus: number
+    milestoneMultiplier: number
   }>
   effects: SkillEffect
   clickBoostMultiplier: number
@@ -35,14 +34,14 @@ export function calculateStats(
   let baseCps = 0
   let baseClick = 1
 
-  // Calculate base CPS and click from upgrades
+  // Calculate base CPS and click from upgrades with milestone multipliers
   for (const upgrade of upgrades) {
     const config = getUpgradeConfig(upgrade.upgradeType)
-    if (!config) continue
+    if (!config || upgrade.level <= 0) continue
 
-    const enhanceMultiplier = 1 + 0.5 * (upgrade.enhancementCount || 0)
-    baseCps += config.cpsBonus * upgrade.level * enhanceMultiplier
-    baseClick += config.clickBonus * upgrade.level * enhanceMultiplier
+    const milestoneMult = getMilestoneMultiplier(upgrade.level)
+    baseCps += config.cpsBonus * upgrade.level * milestoneMult
+    baseClick += config.clickBonus * upgrade.level * milestoneMult
   }
 
   // Apply skill effects
@@ -93,16 +92,11 @@ export function buildUpgradeState(
   level: number
   cost: number
   batchCost: number
-  enhanceCost: number
-  specialEnhanceCost: number
   cpsBonus: number
-  canEnhance: boolean
-  canSpecialEnhance: boolean
-  enhancementCount: number
-  specialEnhancement: number
+  clickBonus: number
   isMaxLevel: boolean
-  specialEffect?: string
-  specialEnhanceMultiplier?: number
+  milestoneMultiplier: number
+  milestoneNextAt: number
 }> {
   const upgradeTypes = Object.keys(require('../config/upgrades').UPGRADE_CONFIG)
   
@@ -114,14 +108,11 @@ export function buildUpgradeState(
         level: 0,
         cost: 0,
         batchCost: 0,
-        enhanceCost: 0,
-        specialEnhanceCost: 0,
         cpsBonus: 0,
-        canEnhance: false,
-        canSpecialEnhance: false,
-        enhancementCount: 0,
-        specialEnhancement: 0,
+        clickBonus: 0,
         isMaxLevel: false,
+        milestoneMultiplier: 1,
+        milestoneNextAt: 50,
       }
     }
 
@@ -135,33 +126,25 @@ export function buildUpgradeState(
       batchCost += Math.floor(config.baseCost * Math.pow(config.multiplier, level + i))
     }
 
-    // Enhancement cost
-    const enhanceCost = config.baseCost * 100
-    const specialEnhanceCost = config.baseCost * 1000
-
-    // Apply cost discount
+    // Apply cost discount from skills
     if (effects.costDiscount) {
       cost = Math.floor(cost * (1 - effects.costDiscount / 100))
       batchCost = Math.floor(batchCost * (1 - effects.costDiscount / 100))
     }
 
-    const isMaxLevel = config.maxLevel !== null && level >= config.maxLevel
+    const milestoneMult = getMilestoneMultiplier(level)
+    const nextMilestoneLevel = (Math.floor(level / 50) + 1) * 50
 
     return {
       type,
       level,
       cost,
       batchCost,
-      enhanceCost,
-      specialEnhanceCost,
       cpsBonus: config.cpsBonus,
-      canEnhance: config.canEnhance,
-      canSpecialEnhance: config.canSpecialEnhance,
-      enhancementCount: upgrade?.enhancementCount || 0,
-      specialEnhancement: upgrade?.specialEnhancement || 0,
-      isMaxLevel,
-      specialEffect: config.specialEffect,
-      specialEnhanceMultiplier: config.specialEnhanceMultiplier,
+      clickBonus: config.clickBonus,
+      isMaxLevel: false,
+      milestoneMultiplier: milestoneMult,
+      milestoneNextAt: nextMilestoneLevel,
     }
   })
 }

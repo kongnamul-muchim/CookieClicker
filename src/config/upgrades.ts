@@ -4,120 +4,78 @@ export interface UpgradeConfig {
   cpsBonus: number
   clickBonus: number
   maxLevel: number | null
-  canEnhance: boolean
-  canSpecialEnhance: boolean
-  specialEffect?: string
-  specialEnhanceMultiplier?: number
 }
 
 export const UPGRADE_CONFIG: Record<string, UpgradeConfig> = {
   click_boost: { 
-    baseCost: 10, 
+    baseCost: 15, 
     multiplier: 1.15, 
     cpsBonus: 0, 
-    clickBonus: 2, 
+    clickBonus: 1, 
     maxLevel: null,
-    canEnhance: true,
-    canSpecialEnhance: false,
   },
   cursor: { 
     baseCost: 15, 
     multiplier: 1.15, 
     cpsBonus: 0.1, 
     clickBonus: 0, 
-    maxLevel: 100,
-    canEnhance: true,
-    canSpecialEnhance: true,
-    specialEffect: 'click_crit_5pct_5x',
-    specialEnhanceMultiplier: 10000,
+    maxLevel: null,
   },
   grandma: { 
     baseCost: 100, 
     multiplier: 1.15, 
     cpsBonus: 1, 
     clickBonus: 0, 
-    maxLevel: 100,
-    canEnhance: true,
-    canSpecialEnhance: true,
-    specialEffect: 'production_1_2x',
-    specialEnhanceMultiplier: 5000,
+    maxLevel: null,
   },
   farm: { 
-    baseCost: 1100, 
+    baseCost: 700, 
     multiplier: 1.15, 
-    cpsBonus: 15, 
+    cpsBonus: 8, 
     clickBonus: 0, 
-    maxLevel: 100,
-    canEnhance: true,
-    canSpecialEnhance: true,
-    specialEffect: 'auto_crit_5pct_5x',
-    specialEnhanceMultiplier: 3000,
+    maxLevel: null,
   },
   mine: { 
-    baseCost: 12000, 
+    baseCost: 6000, 
     multiplier: 1.15, 
-    cpsBonus: 150, 
+    cpsBonus: 47, 
     clickBonus: 0, 
-    maxLevel: 100,
-    canEnhance: true,
-    canSpecialEnhance: true,
-    specialEffect: 'crit_chance_15pct',
-    specialEnhanceMultiplier: 2000,
+    maxLevel: null,
   },
   factory: { 
-    baseCost: 130000, 
+    baseCost: 50000, 
     multiplier: 1.15, 
-    cpsBonus: 1200, 
+    cpsBonus: 260, 
     clickBonus: 0, 
-    maxLevel: 100,
-    canEnhance: true,
-    canSpecialEnhance: true,
-    specialEffect: 'cost_10pct_discount',
-    specialEnhanceMultiplier: 1500,
+    maxLevel: null,
   },
   bank: { 
-    baseCost: 1400000, 
+    baseCost: 500000, 
     multiplier: 1.15, 
-    cpsBonus: 12000, 
+    cpsBonus: 1400, 
     clickBonus: 0, 
-    maxLevel: 100,
-    canEnhance: true,
-    canSpecialEnhance: true,
-    specialEffect: 'interest_0_1pct',
-    specialEnhanceMultiplier: 1000,
+    maxLevel: null,
   },
   temple: { 
-    baseCost: 20000000, 
+    baseCost: 5000000, 
     multiplier: 1.15, 
-    cpsBonus: 100000, 
+    cpsBonus: 7800, 
     clickBonus: 0, 
-    maxLevel: 100,
-    canEnhance: true,
-    canSpecialEnhance: true,
-    specialEffect: 'production_1_5x',
-    specialEnhanceMultiplier: 800,
+    maxLevel: null,
   },
   wizard_tower: { 
-    baseCost: 330000000, 
+    baseCost: 50000000, 
     multiplier: 1.15, 
-    cpsBonus: 800000, 
+    cpsBonus: 44000, 
     clickBonus: 0, 
-    maxLevel: 100,
-    canEnhance: true,
-    canSpecialEnhance: true,
-    specialEffect: 'click_cps_1pct',
-    specialEnhanceMultiplier: 500,
+    maxLevel: null,
   },
   portal: { 
-    baseCost: 5100000000, 
+    baseCost: 500000000, 
     multiplier: 1.15, 
-    cpsBonus: 10000000, 
+    cpsBonus: 260000, 
     clickBonus: 0, 
-    maxLevel: 100,
-    canEnhance: true,
-    canSpecialEnhance: true,
-    specialEffect: 'portal_passive_10pct',
-    specialEnhanceMultiplier: 400,
+    maxLevel: null,
   },
 }
 
@@ -129,14 +87,14 @@ export function calculateUpgradeCost(baseCost: number, level: number): number {
   return Math.floor(baseCost * Math.pow(1.15, level))
 }
 
-export function calculateEnhancementCost(baseCost: number): number {
-  return baseCost * 100
-}
-
-export function calculateSpecialEnhancementCost(baseCost: number): number {
-  return baseCost * 1000
-}
-
 export function getAllUpgradeTypes(): string[] {
   return Object.keys(UPGRADE_CONFIG)
+}
+
+/**
+ * Milestone multiplier for a building.
+ * Every 50 levels → ×2 production for that building type.
+ */
+export function getMilestoneMultiplier(level: number): number {
+  return Math.pow(2, Math.floor(level / 50))
 }
