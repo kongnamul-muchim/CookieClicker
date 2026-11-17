@@ -10,8 +10,16 @@ export async function GET() {
     const cookieStore = await cookies()
     const sessionId = cookieStore.get('player_id')?.value
 
+    // 첫 방문자는 아직 player_id 쿠키가 없다. 401을 던지면 스킬 패널이
+    // 빈 채로 깨져 보이므로, 게스트 기본값을 200으로 내려 화면이 그려지게 한다.
     if (!sessionId) {
-      return NextResponse.json({ error: 'No session' }, { status: 401 })
+      return NextResponse.json({
+        prestigeCount: 0,
+        prestigeStars: 0,
+        unlockedSkills: [],
+        allSkills: getAllSkills(),
+        skillEffects: calculateSkillEffects([]),
+      })
     }
 
     const player = await getOrCreatePlayer(sessionId)
