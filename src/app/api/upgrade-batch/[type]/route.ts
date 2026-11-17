@@ -24,7 +24,8 @@ export async function POST(
 
     // Support both single buy (count=1) and batch buy (default 10)
     const body = await request.json().catch(() => ({}))
-    const count = body.count || 10
+    // 클라이언트가 보낸 count 를 그대로 반복문에 넣으면 서버가 멈춘다. 범위를 제한한다.
+    const count = Math.max(1, Math.min(Number(body.count) || 10, 100))
 
     const result = await buyUpgradeBatch(sessionId, type, player.cookies, count)
 
