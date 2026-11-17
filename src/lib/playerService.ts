@@ -13,6 +13,7 @@ export interface PlayerData {
   totalUpgradesBought: number
   totalEnhancements: number
   totalTranscends: number
+  updatedAt: Date
 }
 
 export async function getOrCreatePlayer(sessionId: string): Promise<PlayerData> {
@@ -38,6 +39,34 @@ export async function updateCookies(sessionId: string, cookies: number): Promise
   return await prisma.player.update({
     where: { sessionId },
     data: { cookies },
+  })
+}
+
+/**
+ * 클라이언트가 보낸 쿠키 값을 서버 기준으로 검증해 반영한다.
+ * 클라이언트는 신뢰할 수 없으므로 "지난 동기화 이후 초당 생산량 × 경과 시간" 만큼만
+ * 증가를 허용하고, 그보다 큰 값은 잘라낸다. 감소는 서버 상태를 유지한다(구매는 서버가 처리).
+ */
+export async function syncCookies(sessionId: string, clientValue: number): Promise<PlayerData> {
+  const player = await getOrCreatePlayer(sessionId)
+
+  const elapsedSec = Math.min(
+    Math.max((Date.now() - new Date(player.updatedAt).getTime()) / 1000, 0),
+    60 * 60 * 24, // 최대 24시간치만 인정
+  )
+  const allowance = Math.floor(player.cookiesPerSecond * elapsedSec) + 30 // 클릭 여유분
+  const capped = Math.max(player.cookies, Math.min(clientValue, player.cookies + allowance))
+
+  if (clientValue - player.cookies > allowance + 1) {
+    console.warn(
+      `[sync] 비정상 증가 차단 session=${sessionId.slice(0, 8)} 요청=${clientValue} 허용=${player.cookies + allowance}`,
+    )
+  }
+
+  if (capped === player.cookies) return player
+  return await prisma.player.update({
+    where: { sessionId },
+    data: { cookies: capped },
   })
 }
 

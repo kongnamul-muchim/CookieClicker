@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { getOrCreatePlayer, updateCookies } from '@/lib/playerService'
+import { syncCookies } from '@/lib/playerService'
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,9 +18,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid cookies value' }, { status: 400 })
     }
 
-    await updateCookies(sessionId, cookieValue)
+    // 클라이언트 값을 그대로 저장하지 않는다. 서버가 허용 범위로 잘라낸다.
+    const player = await syncCookies(sessionId, cookieValue)
 
-    return NextResponse.json({ cookies: cookieValue })
+    return NextResponse.json({ cookies: player.cookies })
   } catch (error) {
     console.error('Error in /api/sync:', error)
     return NextResponse.json(
