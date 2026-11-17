@@ -12,3 +12,8 @@
 - Prisma + PostgreSQL
 - Cookie Clicker Game Engine (Custom)
 - Enhancement / Prestige System
+
+## AI 활용
+
+AI 코딩 에이전트의 작업 세션 기록(`.superpowers/`)이 저장소에 그대로 남아 있습니다.
+어느 부분을 에이전트가 작성했는지 추적할 수 있도록 지우지 않았습니다.
